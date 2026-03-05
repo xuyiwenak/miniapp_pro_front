@@ -21,12 +21,12 @@ function request(url, method = 'GET', data = {}) {
       header,
       success(res) {
         setTimeout(() => {
-          // HTTP状态码为200才视为成功
-          if (res.code === 200) {
-            resolve(res);
+          // Mock 时 WxMock 直接传入 body；真实 wx.request 传入 { data, statusCode, header }，业务 body 在 res.data
+          const body = res.data != null && res.statusCode !== undefined ? res.data : res;
+          if (body && body.code === 200) {
+            resolve(body);
           } else {
-            // wx.request的特性，只要有响应就会走success回调，所以在这里判断状态，非200的均视为请求失败
-            reject(res);
+            reject(body || res);
           }
         }, delay);
       },

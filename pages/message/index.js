@@ -20,7 +20,9 @@ Page({
       data = JSON.parse(data);
       if (data.type === 'message') {
         const { userId, message } = data.data;
-        const { user, index } = this.getUserById(userId);
+        const found = this.getUserById(userId);
+        if (!found) return;
+        const { user, index } = found;
         this.data.messageList.splice(index, 1);
         this.data.messageList.unshift(user);
         user.messages.push(message);
@@ -64,7 +66,7 @@ Page({
     });
   },
 
-  /** 通过 userId 获取 user 对象和下标 */
+  /** 通过 userId 获取 user 对象和下标，不存在时返回 null */
   getUserById(userId) {
     let index = 0;
     while (index < this.data.messageList.length) {
@@ -72,7 +74,7 @@ Page({
       if (user.userId === userId) return { user, index };
       index += 1;
     }
-    // TODO：处理 userId 在列表中不存在的情况（）
+    return null;
   },
 
   /** 计算未读消息数量 */
@@ -87,17 +89,20 @@ Page({
   /** 打开对话页 */
   toChat(event) {
     const { userId } = event.currentTarget.dataset;
-    wx.navigateTo({ url: `/pages/chat/index?userId${userId}` }).then(({ eventChannel }) => {
+    const found = this.getUserById(userId);
+    if (!found) return;
+    wx.navigateTo({ url: `/pages/chat/index?userId=${userId}` }).then(({ eventChannel }) => {
       currentUser = { userId, eventChannel };
-      const { user } = this.getUserById(userId);
-      eventChannel.emit('update', user);
+      eventChannel.emit('update', found.user);
     });
     this.setMessagesRead(userId);
   },
 
   /** 将用户的所有消息标记为已读 */
   setMessagesRead(userId) {
-    const { user } = this.getUserById(userId);
+    const found = this.getUserById(userId);
+    if (!found) return;
+    const { user } = found;
     user.messages.forEach((message) => {
       message.read = true;
     });

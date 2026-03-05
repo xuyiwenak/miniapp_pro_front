@@ -45,11 +45,18 @@
       "less"
     ],
     "condition": false,
-    "ignoreUploadUnusedFiles": true
+    "ignoreUploadUnusedFiles": true,
+    "compileWorklet": false,
+    "localPlugins": false,
+    "swc": false,
+    "disableSWC": true,
+    "lessSetting": {
+      "commonUseFilePath": "app.less"
+    }
   },
   "compileType": "miniprogram",
   "libVersion": "3.7.8",
-  "appid": "wx0ee80a2f23dbd157",
+  "appid": "wxd373971d12379d33",
   "projectname": "miniprogram-starter",
   "condition": {
     "miniprogram": {
@@ -104,5 +111,6 @@
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2
-  }
+  },
+  "simulatorPluginLibVersion": {}
 }

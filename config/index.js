@@ -1,6 +1,3 @@
-/** 是否使用mock代替api返回 */
-export const config = {
-  useMock: true,
-};
-
-export default { config };
+/** 统一从 config.js 导出，避免双份配置 */
+export { default as config } from '../config.js';
+export { default } from '../config.js';

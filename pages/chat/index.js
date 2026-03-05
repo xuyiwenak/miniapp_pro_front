@@ -15,7 +15,7 @@ Page({
     keyboardHeight: 0, // 键盘当前高度(px)
   },
 
-  /** 生命周期函数--监听页面加载 */
+  /** 生命周期函数--监听页面加载（仅通过 EventChannel 接收消息页传来的 update，与 app.eventBus 无关） */
   onLoad(options) {
     this.getOpenerEventChannel().on('update', this.update);
   },
@@ -30,9 +30,7 @@ Page({
   onHide() {},
 
   /** 生命周期函数--监听页面卸载 */
-  onUnload() {
-    app.eventBus.off('update', this.update);
-  },
+  onUnload() {},
 
   /** 页面相关事件处理函数--监听用户下拉动作 */
   onPullDownRefresh() {},
