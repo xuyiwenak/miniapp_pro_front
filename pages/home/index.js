@@ -24,10 +24,13 @@ Page({
       request('/home/swipers').then((res) => res.data),
     ]);
 
+    const cards = Array.isArray(cardRes) ? cardRes : cardRes?.data || [];
+    const swipers = Array.isArray(swiperRes) ? swiperRes : swiperRes?.data || [];
+
     this.setData({
-      cardInfo: cardRes.data,
-      focusCardInfo: cardRes.data.slice(0, 3),
-      swiperList: swiperRes.data,
+      cardInfo: cards,
+      focusCardInfo: cards.slice(0, 3),
+      swiperList: swipers,
     });
   },
   onLoad(option) {
@@ -58,11 +61,14 @@ Page({
       request('/home/swipers').then((res) => res.data),
     ]);
 
+    const cards = Array.isArray(cardRes) ? cardRes : cardRes?.data || [];
+    const swipers = Array.isArray(swiperRes) ? swiperRes : swiperRes?.data || [];
+
     setTimeout(() => {
       this.setData({
         enable: false,
-        cardInfo: cardRes.data,
-        swiperList: swiperRes.data,
+        cardInfo: cards,
+        swiperList: swipers,
       });
     }, 1500);
   },

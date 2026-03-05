@@ -33,7 +33,7 @@ Page({
    */
   getMemberData() {
     request('/dataCenter/member').then((res) => {
-      const totalSituationData = res.data.template.succ.data.list;
+      const totalSituationData = res.data.list;
       this.setData({
         totalSituationDataList: totalSituationData,
       });
@@ -53,7 +53,7 @@ Page({
    */
   getInteractionData() {
     request('/dataCenter/interaction').then((res) => {
-      const interactionSituationData = res.data.template.succ.data.list;
+      const interactionSituationData = res.data.list;
       this.setData({
         interactionSituationDataList: interactionSituationData,
         interactionSituationKeysList: Object.keys(interactionSituationData[0]),
@@ -73,7 +73,7 @@ Page({
    */
   getCompleteRateData() {
     request('/dataCenter/complete-rate').then((res) => {
-      const completeRateData = res.data.template.succ.data.list;
+      const completeRateData = res.data.list;
       this.setData({
         completeRateDataList: completeRateData,
         completeRateKeysList: Object.keys(completeRateData[0]),
@@ -94,7 +94,7 @@ Page({
    */
   getAreaData() {
     request('/dataCenter/area').then((res) => {
-      const areaData = res.data.template.succ.data.list;
+      const areaData = res.data.list;
       this.setData({
         areaDataList: areaData,
         areaDataKeysList: Object.keys(areaData[0]),

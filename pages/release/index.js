@@ -1,4 +1,5 @@
 // pages/release/index.js
+import request from '~/api/request';
 
 Page({
   /**
@@ -26,6 +27,7 @@ Page({
       count: 1,
     },
     tags: ['AI绘画', '版权素材', '原创', '风格灵动'],
+    desc: '',
   },
   handleSuccess(e) {
     const { files } = e.detail;
@@ -53,14 +55,47 @@ Page({
       complete: () => {},
     });
   },
-  saveDraft() {
-    wx.reLaunch({
-      url: `/pages/home/index?oper=save`,
+  onDescChange(e) {
+    this.setData({
+      desc: e.detail.value,
     });
   },
-  release() {
-    wx.reLaunch({
-      url: `/pages/home/index?oper=release`,
-    });
+  async saveDraft() {
+    try {
+      const payload = {
+        desc: this.data.desc || '',
+        tags: this.data.tags || [],
+        images: this.data.originFiles || [],
+        status: 'draft',
+      };
+      await request('/work/publish', 'POST', { data: payload });
+      wx.reLaunch({
+        url: `/pages/home/index?oper=save`,
+      });
+    } catch (err) {
+      wx.showToast({
+        title: '保存草稿失败',
+        icon: 'none',
+      });
+    }
+  },
+  async release() {
+    try {
+      const payload = {
+        desc: this.data.desc || '',
+        tags: this.data.tags || [],
+        images: this.data.originFiles || [],
+        status: 'published',
+      };
+      await request('/work/publish', 'POST', { data: payload });
+      wx.reLaunch({
+        url: `/pages/home/index?oper=release`,
+      });
+    } catch (err) {
+      wx.showToast({
+        title: '发布失败',
+        icon: 'none',
+      });
+    }
   },
 });
