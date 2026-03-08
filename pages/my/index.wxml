@@ -6,7 +6,9 @@
   <view class="my-info">
     <t-cell-group>
       <t-cell wx:if="{{isLoad}}" bordered="{{false}}">
-        <t-avatar image="{{personalInfo.image}}" slot="left-icon" size="large" />
+        <view slot="left-icon" bindtap="onAvatarTap" class="my-info__avatar-wrap">
+          <t-avatar image="{{personalInfo.image}}" size="large" />
+        </view>
         <view class="my-info__person" slot="description">
           <view class="name">{{personalInfo.name}}</view>
           <view class="tags">

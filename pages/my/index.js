@@ -79,6 +79,66 @@ Page({
     wx.navigateTo({ url: `/pages/my/info-edit/index` });
   },
 
+  onAvatarTap() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempPath = res.tempFiles[0].tempFilePath;
+        const fs = wx.getFileSystemManager();
+        fs.readFile({
+          filePath: tempPath,
+          encoding: 'base64',
+          success: (readRes) => {
+            const base64 = readRes.data;
+            const ext = (tempPath.toLowerCase().endsWith('.png') ? 'png' : 'jpeg');
+            const dataUrl = `data:image/${ext};base64,${base64}`;
+            wx.showLoading({ title: '上传中...' });
+            request('/api/uploadAvatar', 'POST', { data: { image: dataUrl } })
+              .then((uploadRes) => {
+                const url = uploadRes.data?.url || uploadRes.url;
+                if (!url) {
+                  wx.hideLoading();
+                  wx.showToast({ title: '上传失败', icon: 'none' });
+                  return;
+                }
+                const personalInfo = this.data.personalInfo || {};
+                const payload = {
+                  name: personalInfo.name,
+                  gender: personalInfo.gender,
+                  birth: personalInfo.birth,
+                  address: personalInfo.address,
+                  brief: personalInfo.brief,
+                  photos: personalInfo.photos,
+                  image: url,
+                  star: personalInfo.star,
+                };
+                return request('/api/savePersonalInfo', 'POST', { data: payload });
+              })
+              .then((saveRes) => {
+                wx.hideLoading();
+                const info = saveRes?.data?.data || saveRes?.data || saveRes;
+                if (info) {
+                  this.setData({ personalInfo: info });
+                  wx.showToast({ title: '头像已更新', icon: 'success' });
+                } else {
+                  wx.showToast({ title: '保存成功', icon: 'success' });
+                }
+              })
+              .catch(() => {
+                wx.hideLoading();
+                wx.showToast({ title: '上传或保存失败', icon: 'none' });
+              });
+          },
+          fail: () => {
+            wx.showToast({ title: '读取图片失败', icon: 'none' });
+          },
+        });
+      },
+    });
+  },
+
   onEleClick(e) {
     const { name, url } = e.currentTarget.dataset.data;
     if (url) return;
