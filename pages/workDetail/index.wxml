@@ -1,0 +1,33 @@
+<view class="work-detail" wx:if="{{!loading && !error && work}}">
+  <view class="work-detail__media">
+    <block wx:if="{{work.images && work.images.length > 0}}">
+      <t-image
+        wx:if="{{work.images.length === 1}}"
+        class="work-detail__cover"
+        src="{{work.images[0].url}}"
+        mode="widthFix"
+      />
+      <swiper wx:else class="work-detail__swiper" indicator-dots autoplay circular>
+        <swiper-item wx:for="{{work.images}}" wx:key="url">
+          <t-image class="work-detail__slide-img" src="{{item.url}}" mode="aspectFit" />
+        </swiper-item>
+      </swiper>
+    </block>
+    <view wx:else class="work-detail__no-image">暂无图片</view>
+  </view>
+  <view class="work-detail__info">
+    <text class="work-detail__desc">{{work.desc}}</text>
+    <view class="work-detail__tags" wx:if="{{work.tags && work.tags.length}}">
+      <t-tag wx:for="{{work.tags}}" wx:key="index" size="small" variant="light">{{item}}</t-tag>
+    </view>
+    <view class="work-detail__meta" wx:if="{{work.createdAt}}">
+      <text>{{work.createdAt}}</text>
+    </view>
+  </view>
+</view>
+<view class="work-detail work-detail--loading" wx:elif="{{loading}}">
+  <text>加载中...</text>
+</view>
+<view class="work-detail work-detail--error" wx:else>
+  <text>{{error || '作品不存在或已下架'}}</text>
+</view>

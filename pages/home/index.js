@@ -85,4 +85,11 @@ Page({
       url: '/pages/release/index',
     });
   },
+  onCardTap(e) {
+    const workId = e.currentTarget.dataset.workId;
+    if (!workId) return;
+    wx.navigateTo({
+      url: '/pages/workDetail/index?workId=' + encodeURIComponent(workId),
+    });
+  },
 });
