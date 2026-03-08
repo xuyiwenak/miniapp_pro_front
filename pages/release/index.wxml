@@ -20,7 +20,7 @@
     <view class="taggroup box">
       <t-cell t-class-title="cell-title-class" t-class-note="cell-note-class" title="添加标签">
         <block wx:for="{{tags}}" wx:key="index">
-          <t-check-tag t-class="tag-class" size="medium" default-checked="{{index===0}}" variant="dark" content="#{{item}}" slot="note" />
+          <t-check-tag t-class="tag-class" size="medium" default-checked="{{index===0}}" variant="dark" content="{{item}}" slot="note" data-tag="{{item}}" bind:change="onTagChange" />
         </block>
       </t-cell>
     </view>

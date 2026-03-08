@@ -27,7 +27,19 @@ Page({
       count: 1,
     },
     tags: ['AI绘画', '版权素材', '原创', '风格灵动'],
+    selectedTags: ['AI绘画'],
     desc: '',
+  },
+  onTagChange(e) {
+    const tag = e.currentTarget.dataset.tag;
+    const checked = e.detail?.checked ?? false;
+    let selectedTags = this.data.selectedTags || [];
+    if (checked) {
+      if (!selectedTags.includes(tag)) selectedTags = selectedTags.concat(tag);
+    } else {
+      selectedTags = selectedTags.filter((t) => t !== tag);
+    }
+    this.setData({ selectedTags });
   },
   handleSuccess(e) {
     const { files } = e.detail;
@@ -64,7 +76,7 @@ Page({
     try {
       const payload = {
         desc: this.data.desc || '',
-        tags: this.data.tags || [],
+        tags: this.data.selectedTags || [],
         images: this.data.originFiles || [],
         status: 'draft',
       };
@@ -83,14 +95,28 @@ Page({
     try {
       const payload = {
         desc: this.data.desc || '',
-        tags: this.data.tags || [],
+        tags: this.data.selectedTags || [],
         images: this.data.originFiles || [],
         status: 'published',
       };
-      await request('/work/publish', 'POST', { data: payload });
-      wx.reLaunch({
-        url: `/pages/home/index?oper=release`,
+      wx.showToast({
+        title: '发布中',
+        icon: 'none',
+        desc: this.data.desc || '',
       });
+      const res = await request('/work/publish', 'POST', { data: payload });
+      if (res.success) {
+        wx.showToast({
+          title: '发布成功',
+          icon: 'none',
+          desc: res.data.workId,
+        });
+      } else {
+        wx.showToast({
+          title: '发布失败',
+          icon: 'none',
+        });
+      }
     } catch (err) {
       wx.showToast({
         title: '发布失败',
