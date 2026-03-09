@@ -15,11 +15,6 @@
       "pages": ["index"]
     },
     {
-      "root": "pages/chat",
-      "name": "chat",
-      "pages": ["index"]
-    },
-    {
       "root": "pages/login",
       "name": "login",
       "pages": ["login"]
@@ -47,6 +42,11 @@
     {
       "root": "pages/ai-list",
       "name": "healing",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/work-list",
+      "name": "works",
       "pages": ["index"]
     }
   ],

@@ -6,7 +6,7 @@ Component({
     list: [
       {
         icon: 'home',
-        value: 'index',
+        value: 'home',
         label: '首页',
       },
       {

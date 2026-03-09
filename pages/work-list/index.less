@@ -1,0 +1,72 @@
+.work-list {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24rpx;
+  box-sizing: border-box;
+
+  &__scroll {
+    max-height: calc(100vh - 88rpx);
+  }
+
+  &__placeholder {
+    margin-top: 120rpx;
+    text-align: center;
+    font-size: 28rpx;
+    color: #999;
+  }
+
+  &__empty {
+    margin-top: 120rpx;
+  }
+
+  &__item {
+    display: flex;
+    padding: 20rpx;
+    margin-bottom: 20rpx;
+    border-radius: 24rpx;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 14rpx 38rpx rgba(121, 138, 145, 0.18);
+  }
+
+  &__cover {
+    width: 200rpx;
+    height: 200rpx;
+    border-radius: 20rpx;
+    overflow: hidden;
+    margin-right: 20rpx;
+    background: #e5e7eb;
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+
+  &__title {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #1f2933;
+    max-height: 80rpx;
+    overflow: hidden;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8rpx;
+    margin-top: 6rpx;
+  }
+
+  &__meta {
+    margin-top: 6rpx;
+    font-size: 22rpx;
+    color: #9ca3af;
+  }
+
+  &__meta-status {
+    color: #4b5563;
+  }
+}
+

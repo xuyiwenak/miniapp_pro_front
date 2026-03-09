@@ -1,16 +1,16 @@
 @import '/variable.less';
 
 .home-card {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
-  width: 340rpx;
-  height: 488rpx;
-  border-radius: 9px;
+  width: 100%;
+  border-radius: 16rpx;
   background: @bg-color-white;
 
   &__image {
-    width: 340rpx;
-    height: 340rpx;
+    width: 100%;
+    /* 接近 INS 单列 4:5 比例，左右撑满 */
+    height: 560rpx;
   }
 
   &__info {

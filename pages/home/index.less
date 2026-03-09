@@ -7,31 +7,19 @@
 
   .home-content {
     height: calc(100% - @nav-bar-height);
-  }
-
-  .t-tabs {
-    --td-tab-item-tag-height: @home-tab-item-height;
-    --td-tab-font-size: @font-size-small;
-    width: 100%;
-    height: 100%;
-
-    &__content {
-      height: calc(100% - @home-tab-item-height);
-      overflow: auto;
-      background-color: @bg-color;
-    }
-  }
-
-  .home-card-list {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 24rpx 12rpx;
-    padding: 24rpx;
     background-color: @bg-color;
   }
 
-  .home-card-wrap {
+  .home-swiper {
+    height: 100%;
+  }
+
+  .home-swiper__item {
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32rpx 24rpx 120rpx;
     box-sizing: border-box;
   }
 }

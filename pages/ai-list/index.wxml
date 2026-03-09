@@ -1,5 +1,3 @@
-<t-navbar title="AI 分析列表" left-arrow bind:left-click="onBack" />
-
 <view class="ai-list">
   <block wx:if="{{loading}}">
     <view class="ai-list__placeholder">加载中...</view>

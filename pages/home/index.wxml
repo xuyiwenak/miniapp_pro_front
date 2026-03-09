@@ -1,42 +1,22 @@
 <nav nav-type="search" />
 <view class="home-container">
   <view class="home-content">
-    <t-tabs defaultValue="recommend">
-      <t-tab-panel label="推荐" value="recommend">
-        <t-pull-down-refresh
-          value="{{enable}}"
-          bind:refresh="onRefresh"
-          loadingTexts="{{['下拉刷新', '松手刷新', '正在刷新', '刷新完成']}}"
-        >
-          <view class="home-card-list">
-            <t-swiper
-              list="{{swiperList}}"
-              navigation="{{ { type: 'dots-bar' } }}"
-              height="488rpx"
-              style="width: 340rpx"
-            />
-            <view class="home-card-wrap" bindtap="onCardTap" data-work-id="{{item.workId}}" wx:for="{{cardInfo}}" wx:key="index">
-              <card
-                desc="{{item.desc}}"
-                url="{{item.url}}"
-                tags="{{item.tags}}"
-              />
-            </view>
-          </view>
-        </t-pull-down-refresh>
-      </t-tab-panel>
-      <t-tab-panel label="我的关注" value="follow">
-        <view class="home-card-list">
-          <view class="home-card-wrap" bindtap="onCardTap" data-work-id="{{item.workId}}" wx:for="{{focusCardInfo}}" wx:key="index">
-            <card
-              desc="{{item.desc}}"
-              url="{{item.url}}"
-              tags="{{item.tags}}"
-            />
-          </view>
+    <swiper class="home-swiper" vertical="true" circular="false" indicator-dots="false">
+      <swiper-item
+        wx:for="{{cardInfo}}"
+        wx:key="workId"
+        data-work-id="{{item.workId}}"
+        bindtap="onCardTap"
+      >
+        <view class="home-swiper__item">
+          <card
+            desc="{{item.desc}}"
+            url="{{item.url}}"
+            tags="{{item.tags}}"
+          />
         </view>
-      </t-tab-panel>
-    </t-tabs>
+      </swiper-item>
+    </swiper>
   </view>
 </view>
 

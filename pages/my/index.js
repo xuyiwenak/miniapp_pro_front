@@ -21,7 +21,7 @@ Page({
         url: '',
       },
       {
-        name: 'AI分析',
+        name: 'AI已分析',
         icon: 'chart-radar',
         type: 'healing',
         url: '/pages/ai-list/index',
@@ -123,12 +123,20 @@ Page({
 
   onEleClick(e) {
     const { name, url, type } = e.currentTarget.dataset.data;
-    if (url) {
-      wx.navigateTo({ url });
+    if (type === 'published') {
+      wx.navigateTo({ url: '/pages/work-list/index?mode=published' });
+      return;
+    }
+    if (type === 'draft') {
+      wx.navigateTo({ url: '/pages/work-list/index?mode=draft' });
       return;
     }
     if (type === 'healing') {
       wx.navigateTo({ url: '/pages/ai-list/index' });
+      return;
+    }
+    if (url) {
+      wx.navigateTo({ url });
       return;
     }
     this.onShowToast('#t-toast', name);

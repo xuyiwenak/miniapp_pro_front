@@ -1,0 +1,47 @@
+<view class="work-list">
+  <block wx:if="{{loading}}">
+    <view class="work-list__placeholder">加载中...</view>
+  </block>
+  <block wx:elif="{{error}}">
+    <view class="work-list__placeholder">{{error}}</view>
+  </block>
+  <block wx:elif="{{!list || !list.length}}">
+    <view class="work-list__empty">
+      <t-empty icon="image" description="{{emptyText}}" />
+    </view>
+  </block>
+  <block wx:else>
+    <scroll-view scroll-y class="work-list__scroll">
+      <view
+        class="work-list__item"
+        wx:for="{{list}}"
+        wx:for-item="item"
+        wx:key="workId"
+        bindtap="onItemTap"
+        data-work-id="{{item.workId}}"
+      >
+        <image class="work-list__cover" src="{{item.coverUrl}}" mode="aspectFill" />
+        <view class="work-list__content">
+          <view class="work-list__title">{{item.desc || '无标题作品'}}</view>
+          <view class="work-list__tags" wx:if="{{item.tags && item.tags.length}}">
+            <t-tag
+              wx:for="{{item.tags}}"
+              wx:for-item="tag"
+              wx:key="*this"
+              size="small"
+              variant="light"
+            >
+              {{tag}}
+            </t-tag>
+          </view>
+          <view class="work-list__meta">
+            <text class="work-list__meta-status">
+              {{mode === 'draft' ? '草稿' : '已发布'}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </block>
+</view>
+

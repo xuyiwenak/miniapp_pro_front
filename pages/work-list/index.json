@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "AI 分析列表",
+  "navigationBarTitleText": "作品列表",
   "usingComponents": {
     "t-empty": "tdesign-miniprogram/empty/empty",
     "t-tag": "tdesign-miniprogram/tag/tag"
