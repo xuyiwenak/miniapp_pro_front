@@ -6,21 +6,8 @@ Page({
 
   data: {
     isLoad: false,
-    service: [],
     personalInfo: {},
     gridList: [
-      {
-        name: '全部发布',
-        icon: 'root-list',
-        type: 'all',
-        url: '',
-      },
-      {
-        name: '审核中',
-        icon: 'search',
-        type: 'progress',
-        url: '',
-      },
       {
         name: '已发布',
         icon: 'upload',
@@ -33,16 +20,18 @@ Page({
         type: 'draft',
         url: '',
       },
+      {
+        name: 'AI分析',
+        icon: 'chart-radar',
+        type: 'healing',
+        url: '/pages/ai-list/index',
+      },
     ],
 
     settingList: [
       { name: '联系客服', icon: 'service', type: 'service' },
       { name: '设置', icon: 'setting', type: 'setting', url: '/pages/setting/index' },
     ],
-  },
-
-  onLoad() {
-    this.getServiceList();
   },
 
   async onShow() {
@@ -55,13 +44,6 @@ Page({
         personalInfo,
       });
     }
-  },
-
-  getServiceList() {
-    request('/api/getServiceList').then((res) => {
-      const { service } = res.data.data;
-      this.setData({ service });
-    });
   },
 
   async getPersonalInfo() {
@@ -140,8 +122,15 @@ Page({
   },
 
   onEleClick(e) {
-    const { name, url } = e.currentTarget.dataset.data;
-    if (url) return;
+    const { name, url, type } = e.currentTarget.dataset.data;
+    if (url) {
+      wx.navigateTo({ url });
+      return;
+    }
+    if (type === 'healing') {
+      wx.navigateTo({ url: '/pages/ai-list/index' });
+      return;
+    }
     this.onShowToast('#t-toast', name);
   },
 });

@@ -2,6 +2,7 @@
   "navigationBarTitleText": "作品详情",
   "usingComponents": {
     "t-image": "tdesign-miniprogram/image/image",
-    "t-tag": "tdesign-miniprogram/tag/tag"
+    "t-tag": "tdesign-miniprogram/tag/tag",
+    "healing-report-card": "/components/healing-report-card/index"
   }
 }

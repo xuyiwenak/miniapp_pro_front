@@ -1,0 +1,52 @@
+<t-navbar title="AI 分析列表" left-arrow bind:left-click="onBack" />
+
+<view class="ai-list">
+  <block wx:if="{{loading}}">
+    <view class="ai-list__placeholder">加载中...</view>
+  </block>
+  <block wx:elif="{{error}}">
+    <view class="ai-list__placeholder">{{error}}</view>
+  </block>
+  <block wx:elif="{{!list || !list.length}}">
+    <view class="ai-list__empty">
+      <t-empty icon="heart" description="还没有生成任何疗愈分析哦~" />
+    </view>
+  </block>
+  <block wx:else>
+    <scroll-view scroll-y class="ai-list__scroll">
+      <view
+        class="ai-list__item"
+        wx:for="{{list}}"
+        wx:for-item="item"
+        wx:key="workId"
+        bindtap="onItemTap"
+        data-work-id="{{item.workId}}"
+      >
+        <image class="ai-list__cover" src="{{item.coverUrl}}" mode="aspectFill" />
+        <view class="ai-list__content">
+          <view class="ai-list__title">{{item.desc || '无标题作品'}}</view>
+          <view class="ai-list__emotion">
+            <text class="ai-list__emotion-label">
+              {{item.dominantEmotionEmoji}} {{item.dominantEmotionLabel}} {{item.dominantEmotionScore}}%
+            </text>
+          </view>
+          <view class="ai-list__tags" wx:if="{{item.tags && item.tags.length}}">
+            <t-tag
+              wx:for="{{item.tags}}"
+              wx:for-item="tag"
+              wx:key="*this"
+              size="small"
+              variant="light"
+            >
+              {{tag}}
+            </t-tag>
+          </view>
+          <view class="ai-list__meta">
+            <text wx:if="{{!item.isPublic}}" class="ai-list__meta-privacy">私密报告</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </block>
+</view>
+

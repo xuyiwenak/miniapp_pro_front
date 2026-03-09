@@ -15,6 +15,49 @@
     </block>
     <view wx:else class="work-detail__no-image">暂无图片</view>
   </view>
+  <view class="work-detail__ai">
+    <view class="work-detail__ai-header">
+      <view class="work-detail__ai-title">
+        <text class="work-detail__ai-label">AI 疗愈分析</text>
+      </view>
+      <view class="work-detail__ai-action">
+        <block wx:if="{{healingStatus === 'none'}}">
+          <text class="work-detail__ai-status">作品未鉴定</text>
+          <button class="work-detail__ai-button" size="mini" bindtap="onAnalyzeTap">AI 分析</button>
+        </block>
+        <block wx:elif="{{healingStatus === 'pending' || healingLoading}}">
+          <text class="work-detail__ai-status">AI 疗愈分析中...</text>
+        </block>
+        <block wx:elif="{{healingStatus === 'success' && healingExists && !healingVisible}}">
+          <text class="work-detail__ai-status work-detail__ai-status--muted">
+            作者将本次疗愈分析设为私密，仅自己可见
+          </text>
+        </block>
+        <block wx:elif="{{healingStatus === 'success' && healingExists && healingVisible && healingReport}}">
+          <text class="work-detail__ai-status">
+            {{healingReport.dominantEmotionLabel}} {{healingReport.dominantEmotionScore}}%
+          </text>
+        </block>
+      </view>
+    </view>
+    <view wx:if="{{healingVisible && healingReport}}">
+      <healing-report-card
+        visible="{{true}}"
+        scores="{{healingReport.scores}}"
+        summary="{{healingReport.summary}}"
+        colorAnalysis="{{healingReport.colorAnalysis}}"
+        isPublic="{{healingReport.isPublic}}"
+        canTogglePrivacy="{{isOwner}}"
+        dominantEmotion="{{healingReport.dominantEmotion}}"
+        dominantEmotionLabel="{{healingReport.dominantEmotionLabel}}"
+        dominantEmotionScore="{{healingReport.dominantEmotionScore}}"
+        bind:toggleprivacy="onTogglePrivacy"
+      />
+    </view>
+    <view wx:if="{{healingError}}" class="work-detail__ai-error">
+      {{healingError}}
+    </view>
+  </view>
   <view class="work-detail__info">
     <text class="work-detail__desc">{{work.desc}}</text>
     <view class="work-detail__tags" wx:if="{{work.tags && work.tags.length}}">

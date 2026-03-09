@@ -27,16 +27,7 @@ Component({
         url: 'pages/release/index',
         isSidebar: false,
       },
-      {
-        title: '消息列表页',
-        url: 'pages/message/index',
-        isSidebar: true,
-      },
-      {
-        title: '对话页',
-        url: 'pages/chat/index',
-        isSidebar: false,
-      },
+      // 原“消息列表页/对话页”已下线，避免出现社交聊天入口
       {
         title: '个人中心页',
         url: 'pages/my/index',

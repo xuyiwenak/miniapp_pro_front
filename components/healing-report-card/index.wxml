@@ -1,0 +1,36 @@
+<view class="healing-card" wx:if="{{visible}}">
+  <view class="healing-card__header">
+    <view class="healing-card__title">
+      <t-icon name="chart-radar" size="40rpx" />
+      <text class="healing-card__title-text">AI 疗愈分析报告</text>
+    </view>
+    <view class="healing-card__privacy" wx:if="{{canTogglePrivacy}}">
+      <text class="healing-card__privacy-label">{{ isPublic ? '公域可见' : '仅自己可见' }}</text>
+      <t-switch size="small" value="{{isPublic}}" bind:change="onPrivacyChange" />
+    </view>
+  </view>
+
+  <view class="healing-card__radar">
+    <canvas
+      canvas-id="radarCanvas"
+      class="healing-card__canvas"
+      style="width: {{canvasSize}}px; height: {{canvasSize}}px;"
+    ></canvas>
+  </view>
+
+  <view class="healing-card__chip" wx:if="{{dominantEmotionLabel}}">
+    <text class="healing-card__chip-label">{{ dominantEmoji }} {{ dominantEmotionLabel }}</text>
+    <text class="healing-card__chip-score">{{ dominantEmotionScore }}%</text>
+  </view>
+
+  <view class="healing-card__section">
+    <view class="healing-card__section-title">核心结论</view>
+    <view class="healing-card__section-content">{{summary}}</view>
+  </view>
+
+  <view class="healing-card__section">
+    <view class="healing-card__section-title">色彩分析</view>
+    <view class="healing-card__section-content">{{colorAnalysis}}</view>
+  </view>
+</view>
+
