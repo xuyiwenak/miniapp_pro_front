@@ -40,6 +40,9 @@
             </text>
           </view>
         </view>
+        <view class="work-list__delete" catchtap="onDeleteTap" data-work-id="{{item.workId}}">
+          <t-icon name="delete" size="40rpx" class="work-list__delete-icon" />
+        </view>
       </view>
     </scroll-view>
   </block>

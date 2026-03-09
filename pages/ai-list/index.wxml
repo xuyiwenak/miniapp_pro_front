@@ -43,6 +43,9 @@
             <text wx:if="{{!item.isPublic}}" class="ai-list__meta-privacy">私密报告</text>
           </view>
         </view>
+        <view class="ai-list__delete" catchtap="onDeleteTap" data-work-id="{{item.workId}}">
+          <t-icon name="delete" size="40rpx" class="ai-list__delete-icon" />
+        </view>
       </view>
     </scroll-view>
   </block>

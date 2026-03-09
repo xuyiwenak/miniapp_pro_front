@@ -55,5 +55,35 @@ Page({
       url: `/pages/workDetail/index?workId=${encodeURIComponent(workId)}`,
     });
   },
+
+  onDeleteTap(e) {
+    const workId = e.currentTarget.dataset.workId;
+    if (!workId) return;
+    const { mode } = this.data;
+    const title = mode === 'draft' ? '删除草稿' : '删除作品';
+    const content =
+      mode === 'draft'
+        ? '确定要删除这条草稿吗？删除后无法恢复。'
+        : '确定要删除这条已发布作品吗？删除后将无法恢复。';
+    wx.showModal({
+      title,
+      content,
+      confirmText: '确认删除',
+      confirmColor: '#FF4D4F',
+      cancelText: '取消',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          await request('/work/delete', 'POST', { data: { workId } });
+          const newList = (this.data.list || []).filter((item) => item.workId !== workId);
+          this.setData({ list: newList });
+          wx.showToast({ title: '已删除', icon: 'none' });
+        } catch (err) {
+          const message = (err && err.message) || err?.data?.message || '删除失败，请稍后重试';
+          wx.showToast({ title: message, icon: 'none' });
+        }
+      },
+    });
+  },
 });
 
