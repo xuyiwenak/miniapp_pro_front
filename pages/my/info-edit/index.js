@@ -35,6 +35,11 @@ function getStarFromBirth(birth) {
   return '';
 }
 
+function normalizeStar(star) {
+  if (!star || typeof star !== 'string') return '';
+  return star.trim().replace('天枰座', '天秤座');
+}
+
 Page({
   data: {
     personInfo: {
@@ -87,15 +92,19 @@ Page({
     request('/api/genPersonalInfo')
       .then((res) => {
         const raw = res.data?.data || res.data || {};
+        const birth = raw.birth || '';
+        const computedStar = getStarFromBirth(birth);
+        const rawStar = normalizeStar(raw.star || '');
+        const star = rawStar || computedStar;
         const personInfo = {
           name: raw.name || '',
           gender: raw.gender ?? 0,
-          birth: raw.birth || '',
+          birth,
           address: Array.isArray(raw.address) ? raw.address : [],
           introduction: raw.brief || '',
           photos: Array.isArray(raw.photos) ? raw.photos : [],
           image: raw.image || '',
-          star: raw.star || '',
+          star,
         };
         this.setData(
           { personInfo },

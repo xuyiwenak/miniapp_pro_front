@@ -26,10 +26,15 @@ Page({
         type: 'healing',
         url: '/pages/ai-list/index',
       },
+      {
+        name: '问题反馈',
+        icon: 'service',
+        type: 'service',
+        url: '/pages/feedback/index',
+      },
     ],
 
     settingList: [
-      { name: '联系客服', icon: 'service', type: 'service' },
       { name: '设置', icon: 'setting', type: 'setting', url: '/pages/setting/index' },
     ],
   },
@@ -133,6 +138,10 @@ Page({
     }
     if (type === 'healing') {
       wx.navigateTo({ url: '/pages/ai-list/index' });
+      return;
+    }
+    if (type === 'service') {
+      wx.navigateTo({ url: '/pages/feedback/index' });
       return;
     }
     if (url) {

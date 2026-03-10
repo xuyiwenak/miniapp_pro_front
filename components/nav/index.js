@@ -3,10 +3,6 @@ Component({
     styleIsolation: 'shared',
   },
   properties: {
-    navType: {
-      type: String,
-      value: 'title',
-    },
     titleText: String,
   },
   data: {
@@ -18,16 +14,10 @@ Component({
         isSidebar: true,
       },
       {
-        title: '搜索页',
-        url: 'pages/search/index',
-        isSidebar: false,
-      },
-      {
         title: '发布页',
         url: 'pages/release/index',
         isSidebar: false,
       },
-      // 原“消息列表页/对话页”已下线，避免出现社交聊天入口
       {
         title: '个人中心页',
         url: 'pages/my/index',
@@ -75,7 +65,6 @@ Component({
         wx.switchTab({
           url: `/${url}`,
         }).then(() => {
-          // 防止点回tab时，sidebar依旧是展开模式
           that.setData({
             visible: false,
           });
@@ -89,12 +78,6 @@ Component({
           });
         });
       }
-    },
-
-    searchTurn() {
-      wx.navigateTo({
-        url: `/pages/search/index`,
-      });
     },
   },
 });

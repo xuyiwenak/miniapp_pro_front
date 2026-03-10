@@ -8,7 +8,7 @@ export default {
     data: {
       image: '/static/avatar1.png',
       name: '小小轩',
-      star: '天枰座',
+      star: '天秤座',
       gender: 0,
       birth: '1994-09-27',
       address: ['440000', '440300'],

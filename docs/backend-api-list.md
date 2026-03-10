@@ -94,10 +94,6 @@
 | 搜索 | `/api/searchPopular` | GET | 热门搜索 |
 | 个人 | `/api/genPersonalInfo` | GET | 个人信息（需 token） |
 | 个人 | `/api/getServiceList` | GET | 个人页服务列表 |
-| 数据看板 | `/dataCenter/member` | GET | 整体情况 |
-| 数据看板 | `/dataCenter/interaction` | GET | 互动情况 |
-| 数据看板 | `/dataCenter/complete-rate` | GET | 完播率 |
-| 数据看板 | `/dataCenter/area` | GET | 按区域统计 |
 | 消息 | 未读数量、会话列表、标记已读 | GET/POST | 见上文 6.1 |
 | 消息 | WebSocket | - | 见上文 6.2 |
 

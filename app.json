@@ -1,14 +1,9 @@
 {
-  "pages": ["pages/home/index", "pages/workDetail/index", "pages/my/index"],
+  "pages": ["pages/home/index", "pages/workDetail/index", "pages/my/index", "pages/feedback/index"],
   "usingComponents": {
     "t-toast": "tdesign-miniprogram/toast/toast"
   },
   "subpackages": [
-    {
-      "root": "pages/search",
-      "name": "search",
-      "pages": ["index"]
-    },
     {
       "root": "pages/my/info-edit",
       "name": "edit",

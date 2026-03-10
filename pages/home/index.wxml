@@ -1,4 +1,4 @@
-<nav nav-type="search" />
+<nav title-text="首页" />
 <view class="home-container">
   <view class="home-content">
     <swiper class="home-swiper" vertical="true" circular="false" indicator-dots="false">
@@ -20,9 +20,4 @@
   </view>
 </view>
 
-<view class="home-release">
-  <t-button theme="primary" size="large" icon="add" shape="round" bindtap="goRelease">
-    发布
-  </t-button>
-</view>
 <t-message id="t-message" />

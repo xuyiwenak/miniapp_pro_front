@@ -1,4 +1,17 @@
-<t-tab-bar value="{{ value }}" theme="tag" split="{{ false }}" bind:change="handleChange">
-  <t-tab-bar-item icon="home" value="home">首页</t-tab-bar-item>
-  <t-tab-bar-item icon="user" value="my">我的</t-tab-bar-item>
-</t-tab-bar>
+<view class="tab-bar">
+  <view class="tab-bar__item {{value === 'home' ? 'tab-bar__item--active' : ''}}" bindtap="handleChange" data-value="home">
+    <t-icon name="home" size="48rpx" />
+    <text class="tab-bar__label">首页</text>
+  </view>
+
+  <view class="tab-bar__publish" bindtap="goRelease">
+    <view class="tab-bar__publish-btn">
+      <t-icon name="add" size="48rpx" color="#fff" />
+    </view>
+  </view>
+
+  <view class="tab-bar__item {{value === 'my' ? 'tab-bar__item--active' : ''}}" bindtap="handleChange" data-value="my">
+    <t-icon name="user" size="48rpx" />
+    <text class="tab-bar__label">我的</text>
+  </view>
+</view>

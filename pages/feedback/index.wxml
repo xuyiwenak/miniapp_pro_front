@@ -1,0 +1,63 @@
+<t-toast id="t-toast" />
+
+<t-navbar title="问题反馈" left-arrow />
+<view class="feedback">
+  <view class="feedback-form">
+    <view class="feedback-field">
+      <view class="feedback-field__label">问题标题</view>
+      <t-input
+        value="{{title}}"
+        placeholder="请简要描述问题（不超过30字）"
+        maxlength="30"
+        borderless="{{true}}"
+        bind:change="onTitleChange"
+      />
+    </view>
+    <view class="feedback-field">
+      <view class="feedback-field__label">问题描述</view>
+      <t-textarea
+        t-class="feedback-textarea"
+        value="{{content}}"
+        placeholder="请详细描述你遇到的问题（不超过300字）"
+        maxlength="300"
+        indicator
+        disableDefaultPadding="{{true}}"
+        bind:change="onContentChange"
+      />
+    </view>
+    <view class="feedback-submit">
+      <t-button
+        theme="primary"
+        size="large"
+        block="{{true}}"
+        loading="{{submitting}}"
+        bindtap="onSubmit"
+      >
+        提交问题
+      </t-button>
+    </view>
+  </view>
+
+  <view class="feedback-list" wx:if="{{feedbackList && feedbackList.length}}">
+    <view class="feedback-list__title">我的历史反馈</view>
+    <block wx:for="{{feedbackList}}" wx:key="id">
+      <view class="feedback-item">
+        <view class="feedback-item__header">
+          <view class="feedback-item__title">{{item.title}}</view>
+          <t-tag size="small" theme="primary" variant="light">
+            {{statusTextMap[item.status] || '待处理'}}
+          </t-tag>
+        </view>
+        <view class="feedback-item__meta">{{item.createdAt}}</view>
+        <view class="feedback-item__content">
+          {{item.content}}
+        </view>
+        <view class="feedback-item__reply" wx:if="{{item.reply}}">
+          <view class="feedback-item__reply-label">客服回复：</view>
+          <view class="feedback-item__reply-text">{{item.reply}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+
