@@ -69,11 +69,34 @@
     color: #4b5563;
   }
 
-  &__delete {
-    width: 72rpx;
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16rpx;
+    padding-left: 8rpx;
+  }
+
+  &__action-btn {
+    width: 64rpx;
+    height: 64rpx;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+  }
+
+  &__publish {
+    background: #e8f5e9;
+  }
+
+  &__publish-icon {
+    color: #4caf50;
+  }
+
+  &__delete {
+    background: #fce4ec;
   }
 
   &__delete-icon {

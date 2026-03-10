@@ -1,0 +1,11 @@
+{
+	"ios": {
+		"name": "CrowdDataTest"
+	},
+	"android": {
+		"name": "CrowdDataTest"
+	},
+	"common": {
+		"name": "CrowdDataTest"
+	}
+}

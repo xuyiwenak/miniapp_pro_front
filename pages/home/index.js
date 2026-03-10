@@ -6,16 +6,9 @@ import request from '~/api/request';
 
 Page({
   data: {
-    enable: false,
+    refreshing: false,
     swiperList: [],
     cardInfo: [],
-    // 发布
-    motto: 'Hello World',
-    userInfo: {},
-    hasUserInfo: false,
-    canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    canIUseGetUserProfile: false,
-    canIUseOpenData: wx.canIUse('open-data.type.userAvatarUrl') && wx.canIUse('open-data.type.userNickName'), // 如需尝试获取用户信息可改为false
   },
   // 生命周期
   async onReady() {
@@ -34,11 +27,6 @@ Page({
     });
   },
   onLoad(option) {
-    if (wx.getUserProfile) {
-      this.setData({
-        canIUseGetUserProfile: true,
-      });
-    }
     if (option.oper) {
       let content = '';
       if (option.oper === 'release') {
@@ -49,28 +37,20 @@ Page({
       this.showOperMsg(content);
     }
   },
-  onRefresh() {
-    this.refresh();
-  },
-  async refresh() {
-    this.setData({
-      enable: true,
-    });
-    const [cardRes, swiperRes] = await Promise.all([
-      request('/home/cards').then((res) => res.data),
-      request('/home/swipers').then((res) => res.data),
-    ]);
-
-    const cards = Array.isArray(cardRes) ? cardRes : cardRes?.data || [];
-    const swipers = Array.isArray(swiperRes) ? swiperRes : swiperRes?.data || [];
-
-    setTimeout(() => {
-      this.setData({
-        enable: false,
-        cardInfo: cards,
-        swiperList: swipers,
-      });
-    }, 1500);
+  async onPullDownRefresh() {
+    this.setData({ refreshing: true });
+    try {
+      const [cardRes, swiperRes] = await Promise.all([
+        request('/home/cards').then((res) => res.data),
+        request('/home/swipers').then((res) => res.data),
+      ]);
+      const cards = Array.isArray(cardRes) ? cardRes : cardRes?.data || [];
+      const swipers = Array.isArray(swiperRes) ? swiperRes : swiperRes?.data || [];
+      this.setData({ cardInfo: cards, swiperList: swipers });
+    } catch (err) {
+      wx.showToast({ title: '刷新失败', icon: 'none' });
+    }
+    setTimeout(() => this.setData({ refreshing: false }), 600);
   },
   showOperMsg(content) {
     Message.success({

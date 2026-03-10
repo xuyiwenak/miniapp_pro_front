@@ -51,8 +51,35 @@ Page({
   onItemTap(e) {
     const workId = e.currentTarget.dataset.workId;
     if (!workId) return;
-    wx.navigateTo({
-      url: `/pages/workDetail/index?workId=${encodeURIComponent(workId)}`,
+    const { mode } = this.data;
+    const source = mode === 'draft' ? 'my' : '';
+    let url = `/pages/workDetail/index?workId=${encodeURIComponent(workId)}`;
+    if (source) {
+      url += `&source=${source}`;
+    }
+    wx.navigateTo({ url });
+  },
+
+  onPublishTap(e) {
+    const workId = e.currentTarget.dataset.workId;
+    if (!workId) return;
+    wx.showModal({
+      title: '发布作品',
+      content: '确定要将这条草稿发布吗？',
+      confirmText: '确认发布',
+      cancelText: '取消',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          await request('/work/publishDraft', 'POST', { data: { workId } });
+          const newList = (this.data.list || []).filter((item) => item.workId !== workId);
+          this.setData({ list: newList });
+          wx.showToast({ title: '已发布', icon: 'success' });
+        } catch (err) {
+          const message = (err && err.message) || err?.data?.message || '发布失败，请稍后重试';
+          wx.showToast({ title: message, icon: 'none' });
+        }
+      },
     });
   },
 

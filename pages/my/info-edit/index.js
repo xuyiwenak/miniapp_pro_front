@@ -1,4 +1,5 @@
 import request from '~/api/request';
+import { uploadImage } from '~/api/upload';
 import { areaList } from './areaData.js';
 
 /** 根据生日 YYYY-MM-DD 计算星座（阳历），仅前端展示用 */
@@ -228,11 +229,38 @@ Page({
     });
   },
 
-  onPhotosSuccess(e) {
-    const { files } = e.detail;
-    this.setData({
-      'personInfo.photos': files,
-    });
+  async onPhotosSuccess(e) {
+    const { files, currentFiles } = e.detail;
+    const newlyAdded = currentFiles || [];
+    if (!newlyAdded.length) {
+      this.setData({
+        'personInfo.photos': files,
+      });
+      return;
+    }
+    wx.showLoading({ title: '上传中...' });
+    try {
+      const uploaded = await Promise.all(
+        newlyAdded.map(async (item) => {
+          const tempPath = item.url || item.tempFilePath;
+          const url = await uploadImage(tempPath);
+          return {
+            url,
+            name: item.name || 'image',
+            type: 'image',
+          };
+        }),
+      );
+      const others = (files || []).filter((f) => !f.url || !f.url.startsWith('wxfile://'));
+      const photos = others.concat(uploaded);
+      this.setData({
+        'personInfo.photos': photos,
+      });
+    } catch (err) {
+      wx.showToast({ title: '图片上传失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   onPhotosDrop(e) {

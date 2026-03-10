@@ -1,23 +1,13 @@
 // pages/release/index.js
 import request from '~/api/request';
+import { uploadImage } from '~/api/upload';
 
 Page({
   /**
    * 页面的初始数据
    */
   data: {
-    originFiles: [
-      {
-        url: '/static/image1.png',
-        name: 'uploaded1.png',
-        type: 'image',
-      },
-      {
-        url: '/static/image2.png',
-        name: 'uploaded2.png',
-        type: 'image',
-      },
-    ],
+    originFiles: [],
     gridConfig: {
       column: 4,
       width: 160,
@@ -41,11 +31,35 @@ Page({
     }
     this.setData({ selectedTags });
   },
-  handleSuccess(e) {
-    const { files } = e.detail;
-    this.setData({
-      originFiles: files,
-    });
+  async handleSuccess(e) {
+    const { files, currentFiles } = e.detail;
+    // currentFiles 包含本次新增的文件（带临时路径）
+    const newlyAdded = currentFiles || [];
+    if (!newlyAdded.length) {
+      this.setData({ originFiles: files });
+      return;
+    }
+    wx.showLoading({ title: '上传中...' });
+    try {
+      const uploaded = await Promise.all(
+        newlyAdded.map(async (item) => {
+          const tempPath = item.url || item.tempFilePath;
+          const url = await uploadImage(tempPath);
+          return {
+            url,
+            name: item.name || 'image',
+            type: 'image',
+          };
+        }),
+      );
+      const others = (files || []).filter((f) => !f.url || !f.url.startsWith('wxfile://'));
+      const originFiles = others.concat(uploaded);
+      this.setData({ originFiles });
+    } catch (err) {
+      wx.showToast({ title: '图片上传失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
+    }
   },
   handleRemove(e) {
     const { index } = e.detail;

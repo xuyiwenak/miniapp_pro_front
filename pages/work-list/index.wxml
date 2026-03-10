@@ -40,8 +40,18 @@
             </text>
           </view>
         </view>
-        <view class="work-list__delete" catchtap="onDeleteTap" data-work-id="{{item.workId}}">
-          <t-icon name="delete" size="40rpx" class="work-list__delete-icon" />
+        <view class="work-list__actions">
+          <view
+            wx:if="{{mode === 'draft'}}"
+            class="work-list__action-btn work-list__publish"
+            catchtap="onPublishTap"
+            data-work-id="{{item.workId}}"
+          >
+            <t-icon name="arrow-up" size="36rpx" class="work-list__publish-icon" />
+          </view>
+          <view class="work-list__action-btn work-list__delete" catchtap="onDeleteTap" data-work-id="{{item.workId}}">
+            <t-icon name="delete" size="36rpx" class="work-list__delete-icon" />
+          </view>
         </view>
       </view>
     </scroll-view>

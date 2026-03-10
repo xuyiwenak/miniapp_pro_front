@@ -7,10 +7,10 @@ export default {
     message: 'success',
     data: {
       image: '/static/avatar1.png',
-      name: '小小轩',
+      name: '用户_mock',
       star: '天秤座',
       gender: 0,
-      birth: '1994-09-27',
+      birth: '1994-01-01',
       address: ['440000', '440300'],
       brief: '在你身边，为你设计',
       photos: [

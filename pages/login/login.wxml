@@ -57,15 +57,6 @@
       <t-button class="button" variant="outline" theme="default" size="medium" shape="round" bindtap="changeLogin">
         {{isPasswordLogin ? '返回微信登录' : '账号密码登录' }}
       </t-button>
-      <t-button
-        class="button"
-        variant="outline"
-        theme="default"
-        size="medium"
-        icon="logo-wechat-stroke"
-        shape="circle"
-        bindtap="wxLogin"
-      ></t-button>
     </view>
   </view>
 </view>

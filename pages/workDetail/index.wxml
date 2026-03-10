@@ -21,36 +21,36 @@
         <text class="work-detail__ai-label">AI 疗愈分析</text>
       </view>
       <view class="work-detail__ai-action">
-        <block wx:if="{{healingStatus === 'none'}}">
+        <block wx:if="{{healingStatus === 'none' && !healingLoading}}">
           <text class="work-detail__ai-status">作品未鉴定</text>
           <button class="work-detail__ai-button" size="mini" bindtap="onAnalyzeTap">AI 分析</button>
         </block>
         <block wx:elif="{{healingStatus === 'pending' || healingLoading}}">
           <text class="work-detail__ai-status">AI 疗愈分析中...</text>
         </block>
-        <block wx:elif="{{healingStatus === 'success' && healingExists && !healingVisible}}">
+        <block wx:elif="{{healingAnalyzed && !healingVisible}}">
           <text class="work-detail__ai-status work-detail__ai-status--muted">
             作者将本次疗愈分析设为私密，仅自己可见
           </text>
         </block>
-        <block wx:elif="{{healingStatus === 'success' && healingExists && healingVisible && healingReport}}">
+        <block wx:elif="{{healingAnalyzed && healingVisible && healingScores}}">
           <text class="work-detail__ai-status">
-            {{healingReport.dominantEmotionLabel}} {{healingReport.dominantEmotionScore}}%
+            {{healingDominantEmotionLabel}} {{healingDominantEmotionScore}}%
           </text>
         </block>
       </view>
     </view>
-    <view wx:if="{{healingVisible && healingReport}}">
+    <view wx:if="{{healingVisible && healingScores}}">
       <healing-report-card
         visible="{{true}}"
-        scores="{{healingReport.scores}}"
-        summary="{{healingReport.summary}}"
-        colorAnalysis="{{healingReport.colorAnalysis}}"
-        isPublic="{{healingReport.isPublic}}"
+        scores="{{healingScores}}"
+        summary="{{healingSummary}}"
+        colorAnalysis="{{healingColorAnalysis}}"
+        isPublic="{{healingIsPublic}}"
         canTogglePrivacy="{{isOwner}}"
-        dominantEmotion="{{healingReport.dominantEmotion}}"
-        dominantEmotionLabel="{{healingReport.dominantEmotionLabel}}"
-        dominantEmotionScore="{{healingReport.dominantEmotionScore}}"
+        dominantEmotion="{{healingDominantEmotion}}"
+        dominantEmotionLabel="{{healingDominantEmotionLabel}}"
+        dominantEmotionScore="{{healingDominantEmotionScore}}"
         bind:toggleprivacy="onTogglePrivacy"
       />
     </view>

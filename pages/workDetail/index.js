@@ -3,86 +3,90 @@ import request from '~/api/request';
 Page({
   data: {
     workId: '',
+    source: '',
     work: null,
     loading: true,
     error: '',
-    // AI 疗愈分析
     healingLoading: false,
     healingError: '',
-    healingReport: null,
-    healingExists: false,
+    healingAnalyzed: false,
     healingVisible: false,
     healingStatus: 'none', // none | pending | success
+    healingIsPublic: true,
+    healingScores: null,
+    healingSummary: '',
+    healingColorAnalysis: '',
+    healingDominantEmotion: '',
+    healingDominantEmotionLabel: '',
+    healingDominantEmotionScore: 0,
     isOwner: false,
   },
 
   onLoad(options) {
     const workId = (options && options.workId) || '';
+    const source = (options && options.source) || '';
     if (!workId) {
       this.setData({ loading: false, error: '缺少作品 ID' });
       return;
     }
-    this.setData({ workId });
-    this.loadWork(workId);
-    this.loadHealingReport(workId);
+    this.setData({ workId, source });
+    this.loadWork(workId, source);
   },
 
-  async loadWork(workId) {
+  async loadWork(workId, source) {
     try {
-      const res = await request('/home/workDetail', 'GET', { workId });
-      const work = res.data || res;
-      this.setData({ work, loading: false, error: '' });
+      const api = source === 'my' ? '/work/detail' : '/home/workDetail';
+      const res = await request(api, 'GET', { workId });
+      const body = res.data || res;
+      this.setData({ work: body, loading: false, error: '' });
+      this.applyHealingFromWork(body);
     } catch (err) {
       const message = (err && err.message) || '加载失败';
       this.setData({ loading: false, error: message });
     }
   },
 
-  async loadHealingReport(workId) {
-    try {
-      this.setData({ healingLoading: true, healingError: '' });
-      const res = await request('/healing/report', 'GET', { workId });
-      const body = res.data || res;
-      if (!body || !body.exists) {
-        this.setData({
-          healingLoading: false,
-          healingExists: false,
-          healingVisible: false,
-          healingStatus: 'none',
-          healingReport: null,
-        });
-        return;
-      }
-
-      if (!body.visible) {
-        this.setData({
-          healingLoading: false,
-          healingExists: true,
-          healingVisible: false,
-          healingStatus: 'success',
-          healingReport: null,
-        });
-        return;
-      }
-
+  applyHealingFromWork(work) {
+    if (!work || !work.healingAnalyzed) {
       this.setData({
-        healingLoading: false,
-        healingExists: true,
-        healingVisible: true,
-        healingStatus: body.status || 'success',
-        healingReport: body,
-        isOwner: !!body.isOwner,
+        healingAnalyzed: false,
+        healingVisible: false,
+        healingStatus: 'none',
+        healingScores: null,
+        isOwner: !!work?.isOwner,
       });
-    } catch (err) {
-      this.setData({
-        healingLoading: false,
-        healingError: '加载疗愈分析失败',
-      });
+      return;
     }
+
+    if (!work.healingVisible) {
+      this.setData({
+        healingAnalyzed: true,
+        healingVisible: false,
+        healingStatus: 'success',
+        healingIsPublic: !!work.healingIsPublic,
+        healingScores: null,
+        isOwner: !!work.isOwner,
+      });
+      return;
+    }
+
+    this.setData({
+      healingAnalyzed: true,
+      healingVisible: true,
+      healingStatus: work.healingStatus || 'success',
+      healingIsPublic: !!work.healingIsPublic,
+      healingScores: work.healingScores || null,
+      healingSummary: work.healingSummary || '',
+      healingColorAnalysis: work.healingColorAnalysis || '',
+      healingDominantEmotion: work.healingDominantEmotion || '',
+      healingDominantEmotionLabel: work.healingDominantEmotionLabel || '',
+      healingDominantEmotionScore: work.healingDominantEmotionScore || 0,
+      isOwner: !!work.isOwner,
+    });
   },
 
   async onAnalyzeTap() {
-    const { workId, healingLoading } = this.data;
+    const { workId, source, healingLoading } = this.data;
     if (!workId || healingLoading) return;
 
     this.setData({
@@ -91,33 +95,15 @@ Page({
       healingStatus: 'pending',
     });
 
-    wx.showToast({
-      title: 'AI 分析中...',
-      icon: 'none',
-    });
+    wx.showToast({ title: 'AI 分析中...', icon: 'none' });
 
     try {
-      const res = await request('/healing/analyze', 'POST', { data: { workId } });
-      const body = res.data || res;
-      if (!body || !body.data) {
-        // 兼容 body 直接是数据的情况
-        this.setData({
-          healingLoading: false,
-        });
-        this.loadHealingReport(workId);
-        return;
-      }
-      this.setData({
-        healingLoading: false,
-        healingStatus: body.data.status || 'success',
-      });
-      this.loadHealingReport(workId);
+      await request('/healing/analyze', 'POST', { data: { workId } });
+      this.setData({ healingLoading: false });
+      this.loadWork(workId, source);
     } catch (err) {
       const message = (err && err.message) || err?.data?.message || '分析失败';
-      wx.showToast({
-        title: message,
-        icon: 'none',
-      });
+      wx.showToast({ title: message, icon: 'none' });
       this.setData({
         healingLoading: false,
         healingStatus: 'none',
@@ -127,47 +113,26 @@ Page({
   },
 
   async onTogglePrivacy(e) {
-    const { workId, healingReport } = this.data;
-    if (!workId || !healingReport) return;
+    const { workId } = this.data;
+    if (!workId || !this.data.healingAnalyzed) return;
     const nextValue = !!e.detail?.value;
-    const prevValue = !!healingReport.isPublic;
+    const prevValue = !!this.data.healingIsPublic;
 
     if (nextValue === prevValue) return;
 
-    this.setData({
-      healingReport: {
-        ...healingReport,
-        isPublic: nextValue,
-      },
-    });
+    this.setData({ healingIsPublic: nextValue });
 
     try {
       const res = await request('/healing/privacy', 'POST', {
         data: { workId, isPublic: nextValue },
       });
       const body = res.data || res;
-      const isPublic = body?.data?.isPublic ?? nextValue;
-      this.setData({
-        healingReport: {
-          ...this.data.healingReport,
-          isPublic,
-        },
-      });
-      wx.showToast({
-        title: '已更新可见范围',
-        icon: 'none',
-      });
+      const isPublic = body?.data?.isPublic ?? body?.isPublic ?? nextValue;
+      this.setData({ healingIsPublic: isPublic });
+      wx.showToast({ title: '已更新可见范围', icon: 'none' });
     } catch (err) {
-      wx.showToast({
-        title: '更新失败，请稍后重试',
-        icon: 'none',
-      });
-      this.setData({
-        healingReport: {
-          ...this.data.healingReport,
-          isPublic: prevValue,
-        },
-      });
+      wx.showToast({ title: '更新失败，请稍后重试', icon: 'none' });
+      this.setData({ healingIsPublic: prevValue });
     }
   },
 });
