@@ -35,18 +35,30 @@ Page({
     ],
 
     settingList: [
-      { name: '设置', icon: 'setting', type: 'setting', url: '/pages/setting/index' },
+      { name: '退出登录', icon: 'poweroff', type: 'logout', url: '' },
     ],
   },
 
   async onShow() {
     const Token = wx.getStorageSync('access_token');
-    const personalInfo = await this.getPersonalInfo();
-
-    if (Token) {
+    if (!Token) {
+      this.setData({
+        isLoad: false,
+        personalInfo: {},
+      });
+      return;
+    }
+    try {
+      const personalInfo = await this.getPersonalInfo();
       this.setData({
         isLoad: true,
         personalInfo,
+      });
+    } catch {
+      // 如果请求失败（例如 token 失效），视为未登录状态
+      this.setData({
+        isLoad: false,
+        personalInfo: {},
       });
     }
   },
@@ -142,6 +154,22 @@ Page({
     }
     if (type === 'service') {
       wx.navigateTo({ url: '/pages/feedback/index' });
+      return;
+    }
+    if (type === 'logout') {
+      // 调用后端注销当前 token
+      const token = wx.getStorageSync('access_token');
+      if (token) {
+        request('/login/logout', 'POST').catch(() => {
+          // 忽略后端错误，继续执行前端退出流程
+        });
+      }
+      wx.removeStorageSync('access_token');
+      this.setData({
+        isLoad: false,
+        personalInfo: {},
+      });
+      wx.navigateTo({ url: '/pages/login/login' });
       return;
     }
     if (url) {

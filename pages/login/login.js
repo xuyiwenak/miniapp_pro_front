@@ -2,8 +2,6 @@ import request from '~/api/request';
 
 Page({
   data: {
-    phoneNumber: '',
-    isPhoneNumber: false,
     isCheck: false,
     isSubmit: false,
     isPasswordLogin: false,
@@ -22,21 +20,10 @@ Page({
       } else {
         this.setData({ isSubmit: false });
       }
-    } else if (this.data.isPhoneNumber && this.data.isCheck) {
-      this.setData({ isSubmit: true });
     } else {
-      this.setData({ isSubmit: false });
+      // 微信登录模式下仅需勾选协议即可提交
+      this.setData({ isSubmit: this.data.isCheck });
     }
-  },
-
-  // 手机号变更
-  onPhoneInput(e) {
-    const isPhoneNumber = /^[1][3,4,5,7,8,9][0-9]{9}$/.test(e.detail.value);
-    this.setData({
-      isPhoneNumber,
-      phoneNumber: e.detail.value,
-    });
-    this.changeSubmit();
   },
 
   // 用户协议选择变更
@@ -64,20 +51,61 @@ Page({
     this.setData({ isPasswordLogin: !this.data.isPasswordLogin, isSubmit: false });
   },
 
+  async wxLogin() {
+    try {
+      const loginRes = await wx.login();
+      const code = loginRes.code;
+      if (!code) {
+        wx.showToast({ title: '获取登录凭证失败', icon: 'none' });
+        return;
+      }
+      const res = await request('/login/wxLogin', 'POST', { data: { code } });
+      if (res.success) {
+        await wx.setStorageSync('access_token', res.data.token);
+        wx.switchTab({
+          url: '/pages/home/index',
+        });
+      } else {
+        wx.showToast({ title: '微信登录失败', icon: 'none' });
+      }
+    } catch (err) {
+      wx.showToast({ title: '微信登录异常', icon: 'none' });
+    }
+  },
+
+  async register() {
+    if (!this.data.isPasswordLogin) {
+      // 只在密码登录模式下允许注册
+      this.setData({ isPasswordLogin: true });
+      return;
+    }
+    const { account, password } = this.data.passwordInfo;
+    if (!account || !password || !this.data.isCheck) {
+      wx.showToast({ title: '请填写账号、密码并勾选协议', icon: 'none' });
+      return;
+    }
+    try {
+      const res = await request('/login/postPasswordRegister', 'POST', {
+        data: { account, password },
+      });
+      if (res.success) {
+        await wx.setStorageSync('access_token', res.data.token);
+        wx.switchTab({
+          url: '/pages/home/index',
+        });
+      }
+    } catch (err) {
+      wx.showToast({ title: '注册失败', icon: 'none' });
+    }
+  },
+
   async login() {
     if (this.data.isPasswordLogin) {
       const res = await request('/login/postPasswordLogin', 'post', { data: this.data.passwordInfo });
       if (res.success) {
         await wx.setStorageSync('access_token', res.data.token);
         wx.switchTab({
-          url: `/pages/my/index`,
-        });
-      }
-    } else {
-      const res = await request('/login/getSendMessage', 'get');
-      if (res.success) {
-        wx.navigateTo({
-          url: `/pages/loginCode/loginCode?phoneNumber=${this.data.phoneNumber}`,
+          url: `/pages/home/index`,
         });
       }
     }

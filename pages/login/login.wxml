@@ -1,9 +1,9 @@
 <t-navbar left-arrow />
 <view class="page login">
-  <view class="login__title"> 欢迎登录 TDsign </view>
+  <view class="login__title"> 欢迎登录</view>
   <view class="login__content">
-    <view class="login__input">
-      <view class="login__password" wx:if="{{isPasswordLogin}}">
+    <view class="login__input" wx:if="{{isPasswordLogin}}">
+      <view class="login__password">
         <t-input
           label="账号"
           placeholder="请输入手机号/邮箱"
@@ -19,16 +19,9 @@
           bindchange="onPasswordChange"
         />
       </view>
-
-      <t-input wx:else value="{{phoneNumber}}" placeholder="请输入手机号" type="number" bindchange="onPhoneInput">
-        <view slot="label" class="input-label">
-          <text>+86</text>
-          <t-icon name="caret-down-small" size="40rpx" class="input-iconl"></t-icon>
-        </view>
-      </t-input>
     </view>
 
-    <view class="login__tips">未注册的手机号验证通过后将自动注册</view>
+    <view class="login__tips">{{isPasswordLogin ? '请输入账号密码进行登录或注册' : '推荐使用微信一键登录'}}</view>
 
     <t-radio-group allow-uncheck borderless value="{{radioValue}}" bind:change="onCheckChange">
       <t-radio
@@ -41,9 +34,15 @@
     </t-radio-group>
 
     <view class="login__button">
-      <t-button theme="primary" size="large" block disabled="{{!isSubmit}}" bindtap="login">
-        {{ isPasswordLogin ? '登录' : '验证并登录' }}
+      <t-button wx:if="{{isPasswordLogin}}" theme="primary" size="large" block disabled="{{!isSubmit}}" bindtap="login">
+        登录
       </t-button>
+      <t-button wx:else theme="primary" size="large" block disabled="{{!isSubmit}}" bindtap="wxLogin">
+        微信一键登录
+      </t-button>
+      <view wx:if="{{isPasswordLogin}}" style="margin-top: 16rpx; text-align: center;">
+        <t-link theme="primary" size="small" bindtap="register">还没有账号？注册并登录</t-link>
+      </view>
     </view>
 
     <view class="login__password--forget" wx:if="{{isPasswordLogin}}">
@@ -56,7 +55,7 @@
     <text class="login__others-label">其他方式</text>
     <view class="login__others-buttons">
       <t-button class="button" variant="outline" theme="default" size="medium" shape="round" bindtap="changeLogin">
-        {{isPasswordLogin ? '验证码登录' : '密码登录' }}
+        {{isPasswordLogin ? '返回微信登录' : '账号密码登录' }}
       </t-button>
       <t-button
         class="button"
@@ -65,15 +64,7 @@
         size="medium"
         icon="logo-wechat-stroke"
         shape="circle"
-      ></t-button>
-      <t-button class="button" variant="outline" theme="default" size="medium" icon="logo-qq" shape="circle"></t-button>
-      <t-button
-        class="button"
-        variant="outline"
-        theme="default"
-        size="medium"
-        icon="logo-wecom"
-        shape="circle"
+        bindtap="wxLogin"
       ></t-button>
     </view>
   </view>

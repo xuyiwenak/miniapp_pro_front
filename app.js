@@ -4,9 +4,7 @@ App({
   onLaunch() {
     const updateManager = wx.getUpdateManager();
 
-    updateManager.onCheckForUpdate((res) => {
-      // console.log(res.hasUpdate)
-    });
+    updateManager.onCheckForUpdate(() => {});
 
     updateManager.onUpdateReady(() => {
       wx.showModal({
@@ -19,7 +17,18 @@ App({
         },
       });
     });
-
+  },
+  onShow() {
+    const token = wx.getStorageSync('access_token');
+    const pages = getCurrentPages();
+    const curPage = pages[pages.length - 1];
+    const route = curPage?.route || '';
+    const isLoginPage = route === 'pages/login/login' || route.startsWith('pages/login/');
+    if (!token && !isLoginPage) {
+      wx.navigateTo({
+        url: '/pages/login/login',
+      });
+    }
   },
   globalData: {
     userInfo: null,
