@@ -1,0 +1,211 @@
+@import '/variable.less';
+
+.mbti-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f0f0f3;
+  color: #111;
+}
+
+// ========== 答题态 ==========
+.quiz-scroll {
+  height: 100vh;
+  padding: 0 28rpx;
+  box-sizing: border-box;
+}
+
+.quiz-spacer {
+  height: 18vh;
+}
+
+// 通用白色圆角矩形卡片
+.quiz-card {
+  background: #ffffff;
+  border-radius: 28rpx;
+  padding: 32rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
+}
+
+// 题目卡片
+.question-card {
+  min-height: 180rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &__no {
+    font-size: 24rpx;
+    font-weight: 600;
+    color: rgba(15, 23, 42, 0.35);
+    margin-bottom: 16rpx;
+  }
+
+  &__text {
+    font-size: 34rpx;
+    line-height: 1.65;
+    color: #111111;
+    font-weight: 500;
+  }
+}
+
+// 进度模块
+.quiz-progress {
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16rpx;
+  }
+
+  &__label {
+    font-size: 24rpx;
+    color: rgba(15, 23, 42, 0.45);
+  }
+
+  &__num {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: rgba(15, 23, 42, 0.7);
+  }
+
+  &__bar-wrap {
+    width: 100%;
+    height: 16rpx;
+    border-radius: 999rpx;
+    background: rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+  }
+
+  &__bar {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff9a9e, #fad0c4, #a1c4fd);
+    transition: width 0.25s ease-out;
+  }
+}
+
+// 选项卡片
+.options-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  padding: 24rpx 28rpx;
+
+  &__item {
+    padding: 24rpx 28rpx;
+    border-radius: 20rpx;
+    background: #f7f7fa;
+    border: 2rpx solid transparent;
+    color: rgba(15, 23, 42, 0.88);
+    font-size: 28rpx;
+    transition: all 0.15s ease-out;
+  }
+
+  &__item--active {
+    background: linear-gradient(135deg, #ffd1e0, #c7d2fe);
+    border-color: rgba(248, 113, 113, 0.5);
+    color: #1e1e2e;
+    font-weight: 500;
+    box-shadow: 0 6rpx 18rpx rgba(248, 113, 113, 0.22);
+  }
+}
+
+// 底部按钮
+.quiz-footer {
+  display: flex;
+  gap: 16rpx;
+  padding: 12rpx 0 calc(env(safe-area-inset-bottom) + 36rpx);
+}
+
+.footer-btn {
+  flex: 1;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+
+  &--ghost {
+    background: #ffffff;
+    color: rgba(15, 23, 42, 0.6);
+    border: 2rpx solid rgba(148, 163, 184, 0.5);
+  }
+
+  &--primary {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: #222222;
+    border: none;
+    font-weight: 500;
+  }
+}
+
+// ========== 结果态 ==========
+.mbti-result {
+  flex: 1;
+  padding: 80rpx 32rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40rpx;
+
+  &__type {
+    font-size: 64rpx;
+    font-weight: 800;
+    letter-spacing: 8rpx;
+    color: #ffffff;
+    padding: 24rpx 48rpx;
+    border-radius: 28rpx;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    box-shadow: 0 20rpx 40rpx rgba(148, 163, 184, 0.55);
+  }
+
+  &__subtitle {
+    font-size: 26rpx;
+    color: rgba(15, 23, 42, 0.55);
+  }
+
+  &__rows {
+    width: 100%;
+    border-radius: 28rpx;
+    background: #ffffff;
+    box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.06);
+    padding: 28rpx 24rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 16rpx;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 26rpx;
+  }
+
+  &__dim {
+    color: rgba(15, 23, 42, 0.7);
+  }
+
+  &__split {
+    color: rgba(148, 163, 184, 0.9);
+    margin: 0 8rpx;
+  }
+
+  &__value {
+    font-weight: 600;
+    color: rgba(15, 23, 42, 0.9);
+
+    &--light {
+      font-weight: 400;
+      color: rgba(148, 163, 184, 0.9);
+    }
+  }
+}
+
+.mbti-page__footer {
+  padding: 16rpx 32rpx calc(env(safe-area-inset-bottom) + 24rpx);
+  display: flex;
+  gap: 16rpx;
+}

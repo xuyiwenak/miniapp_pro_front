@@ -1,0 +1,90 @@
+<view class="mbti-page">
+  <!-- 答题态 -->
+  <scroll-view wx:if="{{!finished}}" class="quiz-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <!-- 顶部留白 -->
+    <view class="quiz-spacer"></view>
+
+    <!-- 题目卡片 -->
+    <view class="quiz-card question-card" animation="{{questionAnim}}">
+      <view class="question-card__no">第 {{currentIndex + 1}} 题</view>
+      <view class="question-card__text">{{currentQuestion.text}}</view>
+    </view>
+
+    <!-- 进度模块 -->
+    <view class="quiz-card quiz-progress">
+      <view class="quiz-progress__head">
+        <text class="quiz-progress__label">答题进度</text>
+        <text class="quiz-progress__num">{{currentIndex + 1}} / {{total}}</text>
+      </view>
+      <view class="quiz-progress__bar-wrap">
+        <view class="quiz-progress__bar" style="width: {{progressPercent}}%;"></view>
+      </view>
+    </view>
+
+    <!-- 选项卡片 -->
+    <view class="quiz-card options-card">
+      <view
+        wx:for="{{options}}"
+        wx:key="value"
+        class="options-card__item {{selectedValue === item.value ? 'options-card__item--active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onOptionTap"
+      >
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+
+    <!-- 上一题 / 下一题 -->
+    <view class="quiz-footer">
+      <button class="footer-btn footer-btn--ghost" bindtap="onPrev" disabled="{{currentIndex === 0}}">上一题</button>
+      <button class="footer-btn footer-btn--primary" bindtap="onNext">
+        {{ currentIndex === total - 1 ? '提交结果' : '下一题' }}
+      </button>
+    </view>
+  </scroll-view>
+
+  <!-- 结果态 -->
+  <view wx:elif="{{finished}}" class="mbti-result">
+    <view class="mbti-result__type" style="{{resultStyle}}">
+      {{resultType}}
+    </view>
+    <view class="mbti-result__subtitle">你的偏好分布</view>
+    <view class="mbti-result__rows" wx:if="{{resultDetail}}">
+      <view class="mbti-result__row">
+        <text class="mbti-result__dim">外向 E</text>
+        <text class="mbti-result__value">{{resultDetail.EI.main}}%</text>
+        <text class="mbti-result__split">/</text>
+        <text class="mbti-result__dim">内向 I</text>
+        <text class="mbti-result__value mbti-result__value--light">{{resultDetail.EI.other}}%</text>
+      </view>
+      <view class="mbti-result__row">
+        <text class="mbti-result__dim">直觉 N</text>
+        <text class="mbti-result__value">{{resultDetail.NS.main}}%</text>
+        <text class="mbti-result__split">/</text>
+        <text class="mbti-result__dim">现实 S</text>
+        <text class="mbti-result__value mbti-result__value--light">{{resultDetail.NS.other}}%</text>
+      </view>
+      <view class="mbti-result__row">
+        <text class="mbti-result__dim">思维 T</text>
+        <text class="mbti-result__value">{{resultDetail.TF.main}}%</text>
+        <text class="mbti-result__split">/</text>
+        <text class="mbti-result__dim">情感 F</text>
+        <text class="mbti-result__value mbti-result__value--light">{{resultDetail.TF.other}}%</text>
+      </view>
+      <view class="mbti-result__row">
+        <text class="mbti-result__dim">计划 J</text>
+        <text class="mbti-result__value">{{resultDetail.JP.main}}%</text>
+        <text class="mbti-result__split">/</text>
+        <text class="mbti-result__dim">灵活 P</text>
+        <text class="mbti-result__value mbti-result__value--light">{{resultDetail.JP.other}}%</text>
+      </view>
+    </view>
+
+    <view class="mbti-page__footer">
+      <button class="footer-btn footer-btn--ghost" bindtap="onBack">返回</button>
+      <button class="footer-btn footer-btn--primary" bindtap="onConfirmUpdate">
+        更新我的 MBTI 人格
+      </button>
+    </view>
+  </view>
+</view>

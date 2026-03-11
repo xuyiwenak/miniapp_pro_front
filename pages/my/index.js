@@ -89,12 +89,7 @@ Page({
   },
 
   onMbtiTap() {
-    const { mbti } = this.data.personalInfo || {};
-    if (mbti) {
-      wx.showToast({ title: `你的 MBTI：${mbti}`, icon: 'none' });
-    } else {
-      wx.navigateTo({ url: '/pages/mbti/index' });
-    }
+    wx.navigateTo({ url: '/pages/mbti/index' });
   },
 
   onAvatarTap() {

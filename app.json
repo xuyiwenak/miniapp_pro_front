@@ -1,5 +1,11 @@
 {
-  "pages": ["pages/home/index", "pages/workDetail/index", "pages/my/index", "pages/feedback/index"],
+  "pages": [
+    "pages/home/index",
+    "pages/workDetail/index",
+    "pages/my/index",
+    "pages/feedback/index",
+    "pages/mbti/index"
+  ],
   "usingComponents": {
     "t-toast": "tdesign-miniprogram/toast/toast"
   },
