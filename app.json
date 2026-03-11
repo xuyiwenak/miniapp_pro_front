@@ -12,7 +12,7 @@
     {
       "root": "pages/login",
       "name": "login",
-      "pages": ["login"]
+      "pages": ["login", "bindChoice"]
     },
     {
       "root": "pages/loginCode",

@@ -60,15 +60,28 @@ Page({
         return;
       }
       const res = await request('/login/wxLogin', 'POST', { data: { code } });
-      if (res.success) {
+      if (res?.success && res?.data?.isNewUser) {
+        await wx.setStorageSync('temp_token', res.data.tempToken);
+        wx.navigateTo({
+          url: '/pages/login/bindChoice',
+        });
+        return;
+      }
+      if (res?.success && res?.data?.token) {
         await wx.setStorageSync('access_token', res.data.token);
+        wx.removeStorageSync('temp_token');
         wx.switchTab({
           url: '/pages/home/index',
         });
-      } else {
-        wx.showToast({ title: '微信登录失败', icon: 'none' });
+        return;
       }
+      wx.showToast({ title: '微信登录失败', icon: 'none' });
     } catch (err) {
+      const msg = err?.message || err?.errmsg || '';
+      if (msg && msg.includes('WeChat config not set')) {
+        wx.showToast({ title: '请先配置微信 appId/appSecret', icon: 'none' });
+        return;
+      }
       wx.showToast({ title: '微信登录异常', icon: 'none' });
     }
   },
