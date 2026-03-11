@@ -1,0 +1,87 @@
+<t-toast id="t-toast" />
+
+<view class="my">
+  <!-- 个人资料区域：顶部背景只用一张照片 -->
+  <view class="profile-header">
+    <image
+      class="profile-header__bg"
+      src="{{personalInfo.photos[0].url || '/static/bg_navbar.png'}}"
+      mode="aspectFill"
+    />
+    <view class="profile-header__mask" />
+
+    <!-- 玻璃拟态卡片 -->
+    <view class="profile-header__glass">
+      <!-- 已登录：头像 + 文本 + 编辑按钮 -->
+      <view class="profile-header__info" wx:if="{{isLoad}}">
+        <view class="profile-header__avatar-wrap">
+          <view class="profile-header__avatar" bindtap="onAvatarTap">
+            <t-avatar image="{{personalInfo.image}}" size="128rpx" />
+          </view>
+          <!-- 头像右下角的小圆编辑按钮 -->
+          <view class="profile-header__edit-fab" bindtap="onNavigateTo">
+            <t-icon name="edit" size="32rpx" color="#fff" />
+          </view>
+        </view>
+        <view class="profile-header__name">{{personalInfo.name}}</view>
+        <view class="profile-header__tags">
+          <view wx:if="{{personalInfo.star}}" class="star-badge">
+            <text class="star-badge__emoji">{{personalInfo.starEmoji}}</text>
+            <text class="star-badge__name">{{personalInfo.star}}</text>
+          </view>
+
+          <!-- MBTI 探索入口胶囊 -->
+          <view class="mbti-entry" bindtap="onMbtiTap">
+            <text class="mbti-entry__label">
+              {{personalInfo.mbti ? personalInfo.mbti : '探索我的 MBTI'}}
+            </text>
+            <view wx:if="{{!personalInfo.mbti}}" class="mbti-entry__progress">
+              <view class="mbti-entry__progress-bar" />
+            </view>
+          </view>
+        </view>
+        <view class="profile-header__brief" wx:if="{{personalInfo.brief}}">
+          {{personalInfo.brief}}
+        </view>
+      </view>
+
+      <!-- 未登录状态 -->
+      <view class="profile-header__login" wx:if="{{!isLoad}}">
+        <t-avatar icon="user" size="128rpx" />
+        <view class="profile-header__login-text" bindtap="onLogin">点击登录/注册</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 下半部分：功能入口，靠近底部 tabBar -->
+  <view class="bottom-section">
+    <view class="func-grid">
+      <view
+        class="func-grid__item func-grid__item--{{index}}"
+        wx:for="{{gridList}}"
+        wx:key="type"
+        data-data="{{item}}"
+        bindtap="onEleClick"
+      >
+        <view class="func-grid__icon-wrap">
+          <t-icon name="{{item.icon}}" size="44rpx" color="#374151" />
+        </view>
+        <text class="func-grid__label">{{item.name}}</text>
+      </view>
+    </view>
+
+    <view class="setting-list">
+      <view
+        class="setting-list__item"
+        wx:for="{{settingList}}"
+        wx:key="type"
+        data-data="{{item}}"
+        bindtap="onEleClick"
+      >
+        <t-icon name="{{item.icon}}" size="36rpx" color="#999" />
+        <text class="setting-list__text">{{item.name}}</text>
+        <t-icon name="chevron-right" size="32rpx" color="#ccc" />
+      </view>
+    </view>
+  </view>
+</view>

@@ -2,6 +2,12 @@ import request from '~/api/request';
 import { uploadImage } from '~/api/upload';
 import useToastBehavior from '~/behaviors/useToast';
 
+const STAR_EMOJI_MAP = {
+  白羊座: '♈', 金牛座: '♉', 双子座: '♊', 巨蟹座: '♋',
+  狮子座: '♌', 处女座: '♍', 天秤座: '♎', 天蝎座: '♏',
+  射手座: '♐', 摩羯座: '♑', 水瓶座: '♒', 双鱼座: '♓',
+};
+
 Page({
   behaviors: [useToastBehavior],
 
@@ -66,6 +72,9 @@ Page({
 
   async getPersonalInfo() {
     const info = await request('/api/genPersonalInfo').then((res) => res.data.data);
+    if (info && info.star) {
+      info.starEmoji = STAR_EMOJI_MAP[info.star] || '';
+    }
     return info;
   },
 
@@ -77,6 +86,15 @@ Page({
 
   onNavigateTo() {
     wx.navigateTo({ url: `/pages/my/info-edit/index` });
+  },
+
+  onMbtiTap() {
+    const { mbti } = this.data.personalInfo || {};
+    if (mbti) {
+      wx.showToast({ title: `你的 MBTI：${mbti}`, icon: 'none' });
+    } else {
+      wx.navigateTo({ url: '/pages/mbti/index' });
+    }
   },
 
   onAvatarTap() {
