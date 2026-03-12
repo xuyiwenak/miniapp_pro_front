@@ -5,7 +5,7 @@
   <view class="profile-bg">
     <image
       class="profile-bg__img"
-      src="{{personalInfo.photos[0].url || '/static/bg_navbar.png'}}"
+      src="{{personalInfo.photos[0].url || '/static/default_wall.png'}}"
       mode="aspectFill"
     />
     <view class="profile-bg__mask" />
