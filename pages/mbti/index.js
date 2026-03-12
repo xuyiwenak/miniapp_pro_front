@@ -78,6 +78,20 @@ Page({
     wx.navigateBack();
   },
 
+  onExitTap() {
+    wx.showModal({
+      title: '确认退出',
+      content: '答题进度将不会保存，确认中断答题并退出吗？',
+      confirmText: '确认',
+      cancelText: '取消',
+      success(res) {
+        if (res.confirm) {
+          wx.navigateBack();
+        }
+      },
+    });
+  },
+
   onOptionTap(e) {
     const { value } = e.currentTarget.dataset;
     const { questions, currentIndex, answers, selectedByIndex } = this.data;

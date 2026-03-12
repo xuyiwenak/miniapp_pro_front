@@ -15,8 +15,41 @@
   box-sizing: border-box;
 }
 
+// 顶部导航栏（退出 + 标题）
+.quiz-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 40rpx) + 16rpx) 4rpx 16rpx;
+
+  &__exit {
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.08);
+
+    &:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+  }
+
+  &__title {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #333;
+  }
+
+  &__placeholder {
+    width: 64rpx;
+  }
+}
+
 .quiz-spacer {
-  height: 18vh;
+  height: 4vh;
 }
 
 // 通用白色圆角矩形卡片

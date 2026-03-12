@@ -93,7 +93,17 @@ Page({
   },
 
   onMbtiTap() {
-    wx.navigateTo({ url: '/pages/mbti/index' });
+    wx.showModal({
+      title: 'MBTI 人格测试',
+      content: '开始 MBTI 人格测试？共 60 题，约需 5 分钟。',
+      confirmText: '开始',
+      cancelText: '取消',
+      success(res) {
+        if (res.confirm) {
+          wx.navigateTo({ url: '/pages/mbti/index' });
+        }
+      },
+    });
   },
 
   onAvatarTap() {

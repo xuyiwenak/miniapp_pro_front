@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "MBTI 人格测试",
   "navigationStyle": "custom",
-  "usingComponents": {}
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon"
+  }
 }
-

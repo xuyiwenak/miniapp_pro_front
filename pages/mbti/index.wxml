@@ -1,6 +1,15 @@
 <view class="mbti-page">
   <!-- 答题态 -->
   <scroll-view wx:if="{{!finished}}" class="quiz-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <!-- 顶部导航栏：退出按钮 -->
+    <view class="quiz-nav">
+      <view class="quiz-nav__exit" bindtap="onExitTap">
+        <t-icon name="close" size="36rpx" color="#666" />
+      </view>
+      <text class="quiz-nav__title">MBTI 人格测试</text>
+      <view class="quiz-nav__placeholder" />
+    </view>
+
     <!-- 顶部留白 -->
     <view class="quiz-spacer"></view>
 
