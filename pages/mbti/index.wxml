@@ -4,9 +4,9 @@
     <!-- 顶部留白 -->
     <view class="quiz-spacer"></view>
 
-    <!-- 题目卡片 -->
+    <!-- 题目卡片（共 60 题，题号不超过 total） -->
     <view class="quiz-card question-card" animation="{{questionAnim}}">
-      <view class="question-card__no">第 {{currentIndex + 1}} 题</view>
+      <view class="question-card__no">第 {{currentIndex + 1 > total ? total : currentIndex + 1}} 题</view>
       <view class="question-card__text">{{currentQuestion.text}}</view>
     </view>
 
@@ -14,7 +14,7 @@
     <view class="quiz-card quiz-progress">
       <view class="quiz-progress__head">
         <text class="quiz-progress__label">答题进度</text>
-        <text class="quiz-progress__num">{{currentIndex + 1}} / {{total}}</text>
+        <text class="quiz-progress__num">{{currentIndex + 1 > total ? total : currentIndex + 1}} / {{total}}</text>
       </view>
       <view class="quiz-progress__bar-wrap">
         <view class="quiz-progress__bar" style="width: {{progressPercent}}%;"></view>

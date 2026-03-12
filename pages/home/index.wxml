@@ -1,4 +1,4 @@
-<nav title-text="首页" />
+<nav title-text="范例展示" />
 <view class="home-container">
   <scroll-view
     class="home-content"

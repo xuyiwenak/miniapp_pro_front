@@ -1,6 +1,7 @@
 import request from '~/api/request';
 import { uploadImage } from '~/api/upload';
 import useToastBehavior from '~/behaviors/useToast';
+import { MBTI_META } from '~/pages/mbti/mbtiConfig';
 
 const STAR_EMOJI_MAP = {
   白羊座: '♈', 金牛座: '♉', 双子座: '♊', 巨蟹座: '♋',
@@ -74,6 +75,9 @@ Page({
     const info = await request('/api/genPersonalInfo').then((res) => res.data.data);
     if (info && info.star) {
       info.starEmoji = STAR_EMOJI_MAP[info.star] || '';
+    }
+    if (info && info.mbti) {
+      info.mbtiEmoji = (MBTI_META[info.mbti] && MBTI_META[info.mbti].emoji) || '';
     }
     return info;
   },

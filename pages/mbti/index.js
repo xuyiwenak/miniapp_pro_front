@@ -93,8 +93,14 @@ Page({
         selectedByIndex: newSelectedByIndex,
       },
       () => {
-        // 自动轻微延迟跳下一题
-        if (currentIndex < this.data.total - 1) {
+        const total = this.data.total;
+        // 最后一题（第 60 题）答完直接进入结算页
+        if (currentIndex === total - 1) {
+          this.onSubmit();
+          return;
+        }
+        // 否则自动轻微延迟跳下一题
+        if (currentIndex < total - 1) {
           setTimeout(() => {
             this.setData({ currentIndex: this.data.currentIndex + 1 }, () => {
               this.updateProgress();
