@@ -103,9 +103,20 @@ dist
 # TernJS port file
 .tern-port
 
-# Wechat miniprogram
+# WeChat 小程序构建/缓存
 miniprogram_npm
+miniprogram_dev/
+miniprogram_dist/
+unpackage/
 
-.idea
-
+# 小程序私有配置（含 appid 等）
 project.private.config.json
+
+# IDE
+.idea/
+
+# 本地私有配置与秘钥
+*local.json
+.env.local
+*.secret.*
+*.private.*
