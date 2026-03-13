@@ -36,7 +36,7 @@
           </view>
           <view class="work-list__meta">
             <text class="work-list__meta-status">
-              {{mode === 'draft' ? '草稿' : '已发布'}}
+              {{mode === 'draft' ? '草稿' : '已上传'}}
             </text>
           </view>
         </view>

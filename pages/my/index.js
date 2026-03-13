@@ -17,7 +17,7 @@ Page({
     personalInfo: {},
     gridList: [
       {
-        name: '已发布',
+        name: '已上传',
         icon: 'upload',
         type: 'published',
         url: '',

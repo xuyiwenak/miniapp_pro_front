@@ -11,11 +11,11 @@ Page({
 
   onLoad(options) {
     const mode = options?.mode === 'draft' ? 'draft' : 'published';
-    const title = mode === 'draft' ? '草稿箱' : '已发布';
+    const title = mode === 'draft' ? '草稿箱' : '已上传';
     wx.setNavigationBarTitle({ title });
     this.setData({
       mode,
-      emptyText: mode === 'draft' ? '还没有保存到草稿箱的作品' : '你还没有发布任何作品',
+      emptyText: mode === 'draft' ? '还没有保存到草稿箱的作品' : '你还没有上传任何作品',
     });
     this.fetchList(mode);
   },
@@ -64,9 +64,9 @@ Page({
     const workId = e.currentTarget.dataset.workId;
     if (!workId) return;
     wx.showModal({
-      title: '发布作品',
-      content: '确定要将这条草稿发布吗？',
-      confirmText: '确认发布',
+      title: '上传作品',
+      content: '确定要将这条草稿上传吗？',
+      confirmText: '确认上传',
       cancelText: '取消',
       success: async (res) => {
         if (!res.confirm) return;
@@ -74,9 +74,9 @@ Page({
           await request('/work/publishDraft', 'POST', { data: { workId } });
           const newList = (this.data.list || []).filter((item) => item.workId !== workId);
           this.setData({ list: newList });
-          wx.showToast({ title: '已发布', icon: 'success' });
+          wx.showToast({ title: '已上传', icon: 'success' });
         } catch (err) {
-          const message = (err && err.message) || err?.data?.message || '发布失败，请稍后重试';
+          const message = (err && err.message) || err?.data?.message || '上传失败，请稍后重试';
           wx.showToast({ title: message, icon: 'none' });
         }
       },
@@ -91,7 +91,7 @@ Page({
     const content =
       mode === 'draft'
         ? '确定要删除这条草稿吗？删除后无法恢复。'
-        : '确定要删除这条已发布作品吗？删除后将无法恢复。';
+        : '确定要删除这条已上传作品吗？删除后将无法恢复。';
     wx.showModal({
       title,
       content,

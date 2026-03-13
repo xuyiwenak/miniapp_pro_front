@@ -70,10 +70,11 @@ Page({
       return;
     }
 
+    const healingStatus = work.healingStatus || 'success';
     this.setData({
       healingAnalyzed: true,
       healingVisible: true,
-      healingStatus: work.healingStatus || 'success',
+      healingStatus,
       healingIsPublic: !!work.healingIsPublic,
       healingScores: work.healingScores || null,
       healingSummary: work.healingSummary || '',
@@ -83,10 +84,22 @@ Page({
       healingDominantEmotionScore: work.healingDominantEmotionScore || 0,
       isOwner: !!work.isOwner,
     });
+
+    if (healingStatus === 'pending') {
+      this.setData({ healingLoading: true });
+      this._pollStatus(this.data.workId);
+    }
+  },
+
+  onUnload() {
+    if (this._pollTimer) {
+      clearTimeout(this._pollTimer);
+      this._pollTimer = null;
+    }
   },
 
   async onAnalyzeTap() {
-    const { workId, source, healingLoading } = this.data;
+    const { workId, healingLoading } = this.data;
     if (!workId || healingLoading) return;
 
     this.setData({
@@ -99,10 +112,9 @@ Page({
 
     try {
       await request('/healing/analyze', 'POST', { data: { workId } });
-      this.setData({ healingLoading: false });
-      this.loadWork(workId, source);
+      this._pollStatus(workId);
     } catch (err) {
-      const message = (err && err.message) || err?.data?.message || '分析失败';
+      const message = (err && err.message) || err?.data?.message || '提交分析失败';
       wx.showToast({ title: message, icon: 'none' });
       this.setData({
         healingLoading: false,
@@ -110,6 +122,53 @@ Page({
         healingError: message,
       });
     }
+  },
+
+  _pollStatus(workId) {
+    if (this._pollTimer) clearTimeout(this._pollTimer);
+
+    const poll = async () => {
+      try {
+        const res = await request('/healing/status', 'GET', { workId });
+        const body = res.data || res;
+        const status = body.status || body.data?.status;
+
+        if (status === 'success') {
+          const data = body.data || body;
+          this.setData({
+            healingLoading: false,
+            healingAnalyzed: true,
+            healingVisible: true,
+            healingStatus: 'success',
+            healingScores: data.scores || null,
+            healingSummary: data.summary || '',
+            healingColorAnalysis: data.colorAnalysis || '',
+            healingDominantEmotion: data.dominantEmotion || '',
+            healingDominantEmotionLabel: data.dominantEmotionLabel || '',
+            healingDominantEmotionScore: data.dominantEmotionScore || 0,
+            healingIsPublic: data.isPublic !== false,
+          });
+          wx.showToast({ title: '分析完成', icon: 'success' });
+          return;
+        }
+
+        if (status === 'failed') {
+          this.setData({
+            healingLoading: false,
+            healingStatus: 'none',
+            healingError: '分析失败，请稍后重试',
+          });
+          wx.showToast({ title: '分析失败', icon: 'none' });
+          return;
+        }
+
+        this._pollTimer = setTimeout(poll, 5000);
+      } catch {
+        this._pollTimer = setTimeout(poll, 5000);
+      }
+    };
+
+    this._pollTimer = setTimeout(poll, 3000);
   },
 
   async onTogglePrivacy(e) {

@@ -30,7 +30,7 @@ Page({
     if (option.oper) {
       let content = '';
       if (option.oper === 'release') {
-        content = '发布成功';
+        content = '上传成功';
       } else if (option.oper === 'save') {
         content = '保存成功';
       }

@@ -114,26 +114,26 @@ Page({
         status: 'published',
       };
       wx.showToast({
-        title: '发布中',
+        title: '上传中',
         icon: 'none',
         desc: this.data.desc || '',
       });
       const res = await request('/work/publish', 'POST', { data: payload });
       if (res.success) {
         wx.showToast({
-          title: '发布成功',
+          title: '上传成功',
           icon: 'none',
           desc: res.data.workId,
         });
       } else {
         wx.showToast({
-          title: '发布失败',
+          title: '上传失败',
           icon: 'none',
         });
       }
     } catch (err) {
       wx.showToast({
-        title: '发布失败',
+        title: '上传失败',
         icon: 'none',
       });
     }

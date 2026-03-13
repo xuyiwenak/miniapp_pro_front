@@ -1,4 +1,4 @@
-<t-navbar title="发布动态" left-arrow />
+<t-navbar title="上传作品" left-arrow />
 <view class="page">
   <view class="release-container">
     <view class="upload box">
@@ -24,12 +24,10 @@
         </block>
       </t-cell>
     </view>
-    <view class="location box">
-      <t-cell title="所在位置" hover arrow leftIcon="location" bindtap="gotoMap" />
-    </view>
+    
     <view class="btngroup box">
       <t-button t-class="btn-class" theme="light" icon="file-copy" content="存草稿" size="large" bindtap="saveDraft"></t-button>
-      <t-button t-class="btn-class" theme="primary" icon="upload" content="发布" size="large" bindtap="release"></t-button>
+      <t-button t-class="btn-class" theme="primary" icon="upload" content="上传" size="large" bindtap="release"></t-button>
     </view>
   </view>
 </view>

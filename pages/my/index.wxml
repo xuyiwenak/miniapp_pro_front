@@ -1,7 +1,6 @@
 <t-toast id="t-toast" />
 
 <view class="my">
-  <!-- 顶部背景图（小红书：短背景 + 下方资料区重叠） -->
   <view class="profile-bg">
     <image
       class="profile-bg__img"
