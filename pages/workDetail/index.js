@@ -22,6 +22,16 @@ Page({
     isOwner: false,
   },
 
+  formatDate(dateInput) {
+    if (!dateInput) return "";
+    const d = new Date(dateInput);
+    if (Number.isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${year}年${month}月${day}日`;
+  },
+
   onLoad(options) {
     const workId = (options && options.workId) || '';
     const source = (options && options.source) || '';
@@ -38,7 +48,11 @@ Page({
       const api = source === 'my' ? '/work/detail' : '/home/workDetail';
       const res = await request(api, 'GET', { workId });
       const body = res.data || res;
-      this.setData({ work: body, loading: false, error: '' });
+      const enhancedWork = {
+        ...body,
+        createdAtDisplay: this.formatDate(body.createdAt),
+      };
+      this.setData({ work: enhancedWork, loading: false, error: '' });
       this.applyHealingFromWork(body);
     } catch (err) {
       const message = (err && err.message) || '加载失败';
@@ -108,7 +122,7 @@ Page({
       healingStatus: 'pending',
     });
 
-    wx.showToast({ title: 'AI 分析中...', icon: 'none' });
+    wx.showToast({ title: '分析中...', icon: 'none' });
 
     try {
       await request('/healing/analyze', 'POST', { data: { workId } });

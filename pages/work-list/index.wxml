@@ -38,6 +38,9 @@
             <text class="work-list__meta-status">
               {{mode === 'draft' ? '草稿' : '已上传'}}
             </text>
+            <text wx:if="{{item.createdAtDisplay}}" class="work-list__meta-date">
+              {{item.createdAtDisplay}}
+            </text>
           </view>
         </view>
         <view class="work-list__actions">

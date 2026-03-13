@@ -18,15 +18,15 @@
   <view class="work-detail__ai">
     <view class="work-detail__ai-header">
       <view class="work-detail__ai-title">
-        <text class="work-detail__ai-label">AI 疗愈分析</text>
+        <text class="work-detail__ai-label">分析结果</text>
       </view>
       <view class="work-detail__ai-action">
         <block wx:if="{{healingStatus === 'none' && !healingLoading}}">
-          <text class="work-detail__ai-status">作品未鉴定</text>
-          <button class="work-detail__ai-button" size="mini" bindtap="onAnalyzeTap">AI 分析</button>
+          <text class="work-detail__ai-status">未做内容分析</text>
+          <button class="work-detail__ai-button" size="mini" bindtap="onAnalyzeTap">点击分析</button>
         </block>
         <block wx:elif="{{healingStatus === 'pending' || healingLoading}}">
-          <text class="work-detail__ai-status">AI 疗愈分析中...</text>
+          <text class="work-detail__ai-status">分析中...</text>
         </block>
         <block wx:elif="{{healingAnalyzed && !healingVisible}}">
           <text class="work-detail__ai-status work-detail__ai-status--muted">
@@ -63,8 +63,8 @@
     <view class="work-detail__tags" wx:if="{{work.tags && work.tags.length}}">
       <t-tag wx:for="{{work.tags}}" wx:key="index" size="small" variant="light">{{item}}</t-tag>
     </view>
-    <view class="work-detail__meta" wx:if="{{work.createdAt}}">
-      <text>{{work.createdAt}}</text>
+    <view class="work-detail__meta" wx:if="{{work.createdAtDisplay}}">
+      <text>{{work.createdAtDisplay}}</text>
     </view>
   </view>
 </view>

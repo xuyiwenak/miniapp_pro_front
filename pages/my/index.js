@@ -29,7 +29,7 @@ Page({
         url: '',
       },
       {
-        name: 'AI已分析',
+        name: '已分析',
         icon: 'chart-radar',
         type: 'healing',
         url: '/pages/ai-list/index',

@@ -16,8 +16,8 @@ Page({
     config: {
       count: 1,
     },
-    tags: ['AI绘画', '版权素材', '原创', '风格灵动'],
-    selectedTags: ['AI绘画'],
+    tags: ['绘画', '版权素材', '原创', '风格灵动'],
+    selectedTags: ['绘画'],
     desc: '',
   },
   onTagChange(e) {

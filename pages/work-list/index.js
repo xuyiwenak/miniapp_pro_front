@@ -26,6 +26,16 @@ Page({
     this.fetchList(mode);
   },
 
+  formatDate(dateInput) {
+    if (!dateInput) return "";
+    const d = new Date(dateInput);
+    if (Number.isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${year}年${month}月${day}日`;
+  },
+
   async fetchList(mode) {
     this.setData({
       loading: true,
@@ -35,9 +45,13 @@ Page({
       const res = await request('/work/list', 'GET', { status: mode });
       const body = res.data || res;
       const list = Array.isArray(body) ? body : body?.data || [];
+      const enhancedList = list.map((item) => ({
+        ...item,
+        createdAtDisplay: this.formatDate(item.createdAt),
+      }));
       this.setData({
         loading: false,
-        list,
+        list: enhancedList,
       });
     } catch (err) {
       const message = (err && err.message) || '加载失败，请稍后重试';

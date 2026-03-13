@@ -9,7 +9,7 @@ export default {
         desc: '少年,星空与梦想',
         tags: [
           {
-            text: 'AI绘画',
+            text: '绘画',
             theme: 'primary',
           },
           {

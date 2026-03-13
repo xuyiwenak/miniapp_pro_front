@@ -67,7 +67,7 @@ Page({
     if (!workId) return;
     wx.showModal({
       title: '删除分析',
-      content: '确定要删除这条 AI 分析记录吗？删除后可以重新发起分析。',
+      content: '确定要删除这条分析记录吗？删除后可以重新发起分析。',
       confirmText: '确认删除',
       confirmColor: '#FF4D4F',
       cancelText: '取消',

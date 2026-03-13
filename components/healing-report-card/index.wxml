@@ -2,7 +2,7 @@
   <view class="healing-card__header">
     <view class="healing-card__title">
       <t-icon name="chart-radar" size="40rpx" />
-      <text class="healing-card__title-text">AI 疗愈分析报告</text>
+      <text class="healing-card__title-text">分析结果</text>
     </view>
     <view class="healing-card__privacy" wx:if="{{canTogglePrivacy}}">
       <text class="healing-card__privacy-label">{{ isPublic ? '公域可见' : '仅自己可见' }}</text>
