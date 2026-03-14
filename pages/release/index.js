@@ -1,6 +1,14 @@
 // pages/release/index.js
 import request from '~/api/request';
 import { uploadImage } from '~/api/upload';
+import config from '~/config';
+
+function toPreviewUrl(url) {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const base = (config && config.baseUrl) || '';
+  return base ? `${base.replace(/\/+$/, '')}${url.startsWith('/') ? url : '/' + url}` : url;
+}
 
 Page({
   /**
@@ -32,33 +40,36 @@ Page({
     this.setData({ selectedTags });
   },
   async handleSuccess(e) {
-    const { files, currentFiles } = e.detail;
-    // currentFiles 包含本次新增的文件（带临时路径）
-    const newlyAdded = currentFiles || [];
+    const { files, currentFiles } = e.detail || {};
+    // TDesign 有时只传 files 不传 currentFiles，用“无 storedUrl 的项”视为本次新选待上传
+    const newlyAdded =
+      (currentFiles && currentFiles.length) > 0
+        ? currentFiles
+        : (files || []).filter((f) => !f.storedUrl);
     if (!newlyAdded.length) {
-      this.setData({ originFiles: files });
+      this.setData({ originFiles: (files || []).filter((f) => f.storedUrl) });
       return;
     }
     wx.showLoading({ title: '上传中...' });
     try {
       const uploaded = await Promise.all(
         newlyAdded.map(async (item) => {
-          const tempPath = item.url || item.tempFilePath;
-          const { url, cdnUrl } = await uploadImage(tempPath);
+          const localPath = item.url || item.tempFilePath;
+          const { url, cdnUrl } = await uploadImage(localPath);
+          const previewUrl = toPreviewUrl(cdnUrl || url);
           return {
-            url: cdnUrl || url,
+            url: previewUrl,
             storedUrl: url,
             name: item.name || 'image',
             type: 'image',
           };
         }),
       );
-      const isTempPath = (u) => !u || u.startsWith('wxfile://') || u.startsWith('http://tmp/');
-      const others = (files || []).filter((f) => f.url && !isTempPath(f.url));
-      const originFiles = others.concat(uploaded);
-      this.setData({ originFiles });
+      const others = (files || []).filter((f) => f.storedUrl);
+      this.setData({ originFiles: others.concat(uploaded) });
     } catch (err) {
-      wx.showToast({ title: '图片上传失败', icon: 'none' });
+      const msg = (err && err.code === 401) ? '请先登录' : '图片上传失败';
+      wx.showToast({ title: msg, icon: 'none' });
     } finally {
       wx.hideLoading();
     }
@@ -88,13 +99,22 @@ Page({
       desc: e.detail.value,
     });
   },
-  async saveDraft() {
-    try {
-      const images = (this.data.originFiles || []).map((f) => ({
-        url: f.storedUrl || f.url,
+  getUploadedImageUrls() {
+    return (this.data.originFiles || [])
+      .filter((f) => f.storedUrl)
+      .map((f) => ({
+        url: f.storedUrl,
         name: f.name || 'image',
         type: f.type || 'image',
       }));
+  },
+  async saveDraft() {
+    try {
+      const images = this.getUploadedImageUrls();
+      if (!this.data.desc && !images.length) {
+        wx.showToast({ title: '请添加描述或图片', icon: 'none' });
+        return;
+      }
       const payload = {
         desc: this.data.desc || '',
         tags: this.data.selectedTags || [],
@@ -113,41 +133,36 @@ Page({
     }
   },
   async release() {
+    const token = wx.getStorageSync('access_token');
+    if (!token) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
     try {
-      const images = (this.data.originFiles || []).map((f) => ({
-        url: f.storedUrl || f.url,
-        name: f.name || 'image',
-        type: f.type || 'image',
-      }));
+      const images = this.getUploadedImageUrls();
+      if (!this.data.desc && !images.length) {
+        wx.showToast({ title: '请添加描述或图片后再发布', icon: 'none' });
+        return;
+      }
       const payload = {
         desc: this.data.desc || '',
         tags: this.data.selectedTags || [],
         images,
         status: 'published',
       };
-      wx.showToast({
-        title: '上传中',
-        icon: 'none',
-        desc: this.data.desc || '',
-      });
+      wx.showLoading({ title: '发布中...' });
       const res = await request('/work/publish', 'POST', { data: payload });
-      if (res.success) {
-        wx.showToast({
-          title: '上传成功',
-          icon: 'none',
-          desc: res.data.workId,
-        });
+      wx.hideLoading();
+      if (res && (res.success || res.data)) {
+        wx.showToast({ title: '发布成功', icon: 'success' });
       } else {
-        wx.showToast({
-          title: '上传失败',
-          icon: 'none',
-        });
+        wx.showToast({ title: '发布失败', icon: 'none' });
       }
     } catch (err) {
-      wx.showToast({
-        title: '上传失败',
-        icon: 'none',
-      });
+      wx.hideLoading();
+      const code = err && (err.code ?? err.data?.code);
+      const msg = code === 401 ? '请先登录' : ((err && err.message) || (err && err.data && err.data.message) || '发布失败');
+      wx.showToast({ title: msg, icon: 'none' });
     }
   },
 });

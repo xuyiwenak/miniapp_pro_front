@@ -19,6 +19,10 @@ Page({
     healingDominantEmotion: '',
     healingDominantEmotionLabel: '',
     healingDominantEmotionScore: 0,
+    healingCompositionReport: '',
+    healingLineAnalysis: null,
+    healingSuggestion: '',
+    healingKeyColors: [],
     isOwner: false,
   },
 
@@ -96,6 +100,10 @@ Page({
       healingDominantEmotion: work.healingDominantEmotion || '',
       healingDominantEmotionLabel: work.healingDominantEmotionLabel || '',
       healingDominantEmotionScore: work.healingDominantEmotionScore || 0,
+      healingCompositionReport: work.healingCompositionReport || '',
+      healingLineAnalysis: work.healingLineAnalysis || null,
+      healingSuggestion: work.healingSuggestion || '',
+      healingKeyColors: work.healingKeyColors || [],
       isOwner: !!work.isOwner,
     });
 
@@ -161,6 +169,10 @@ Page({
             healingDominantEmotionLabel: data.dominantEmotionLabel || '',
             healingDominantEmotionScore: data.dominantEmotionScore || 0,
             healingIsPublic: data.isPublic !== false,
+            healingCompositionReport: data.compositionReport || '',
+            healingLineAnalysis: data.lineAnalysis || null,
+            healingSuggestion: data.suggestion || '',
+            healingKeyColors: data.keyColors || [],
           });
           wx.showToast({ title: '分析完成', icon: 'success' });
           return;

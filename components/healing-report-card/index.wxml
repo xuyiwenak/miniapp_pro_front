@@ -32,5 +32,31 @@
     <view class="healing-card__section-title">色彩分析</view>
     <view class="healing-card__section-content">{{colorAnalysis}}</view>
   </view>
+
+  <view class="healing-card__section" wx:if="{{compositionReport}}">
+    <view class="healing-card__section-title">构图分析</view>
+    <view class="healing-card__section-content">{{compositionReport}}</view>
+  </view>
+
+  <view class="healing-card__section" wx:if="{{lineAnalysis && (lineAnalysis.interpretation || lineAnalysis.style || lineAnalysis.energy_score != null)}}">
+    <view class="healing-card__section-title">线条与能量</view>
+    <view class="healing-card__section-content">
+      <block wx:if="{{lineAnalysis.interpretation}}">{{lineAnalysis.interpretation}}</block>
+      <block wx:if="{{lineAnalysis.style}}"> 风格：{{lineAnalysis.style}}</block>
+      <block wx:if="{{lineAnalysis.energy_score != null}}"> 能量值：{{lineAnalysis.energy_score}}</block>
+    </view>
+  </view>
+
+  <view class="healing-card__section" wx:if="{{suggestion}}">
+    <view class="healing-card__section-title">建议</view>
+    <view class="healing-card__section-content">{{suggestion}}</view>
+  </view>
+
+  <view class="healing-card__section" wx:if="{{keyColors && keyColors.length > 0}}">
+    <view class="healing-card__section-title">主色</view>
+    <view class="healing-card__tags">
+      <text class="healing-card__tag" wx:for="{{keyColors}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
 </view>
 

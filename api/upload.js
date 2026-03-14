@@ -35,7 +35,12 @@ export function uploadImage(tempFilePath) {
                   cdnUrl: (body && body.cdnUrl) || url,
                 });
               } else {
-                reject(data || new Error('upload response missing url'));
+                const code = (data && data.code) || 401;
+                if (code === 401) {
+                  reject({ code: 401, message: '请先登录' });
+                } else {
+                  reject(data || new Error('upload response missing url'));
+                }
               }
             } catch (e) {
               reject(e);

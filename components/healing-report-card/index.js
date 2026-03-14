@@ -44,6 +44,22 @@ Component({
       type: Number,
       value: 0,
     },
+    compositionReport: {
+      type: String,
+      value: '',
+    },
+    lineAnalysis: {
+      type: Object,
+      value: null,
+    },
+    suggestion: {
+      type: String,
+      value: '',
+    },
+    keyColors: {
+      type: Array,
+      value: [],
+    },
   },
 
   data: {
