@@ -243,7 +243,8 @@ Page({
       const uploaded = await Promise.all(
         newlyAdded.map(async (item) => {
           const tempPath = item.url || item.tempFilePath;
-          const url = await uploadImage(tempPath);
+          const res = await uploadImage(tempPath);
+          const url = res && (res.url != null ? res.url : res);
           return {
             url,
             name: item.name || 'image',
@@ -251,7 +252,8 @@ Page({
           };
         }),
       );
-      const others = (files || []).filter((f) => !f.url || !f.url.startsWith('wxfile://'));
+      const isTempPath = (u) => !u || u.startsWith('wxfile://') || u.startsWith('http://tmp/');
+      const others = (files || []).filter((f) => f.url && !isTempPath(f.url));
       const photos = others.concat(uploaded);
       this.setData({
         'personInfo.photos': photos,

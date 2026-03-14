@@ -27,12 +27,15 @@ export function uploadImage(tempFilePath) {
           success(res) {
             try {
               const data = JSON.parse(res.data || '{}');
-              if (data && data.code === 200 && data.data && data.data.url) {
-                resolve(data.data.url);
-              } else if (data && data.url) {
-                resolve(data.url);
+              const body = (data && data.data) || data;
+              const url = (body && body.url) || (data && data.url);
+              if (url) {
+                resolve({
+                  url,
+                  cdnUrl: (body && body.cdnUrl) || url,
+                });
               } else {
-                reject(data);
+                reject(data || new Error('upload response missing url'));
               }
             } catch (e) {
               reject(e);

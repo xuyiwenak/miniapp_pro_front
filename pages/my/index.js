@@ -115,7 +115,8 @@ Page({
         const tempPath = res.tempFiles[0].tempFilePath;
         wx.showLoading({ title: '上传中...' });
         try {
-          const url = await uploadImage(tempPath);
+          const res = await uploadImage(tempPath);
+          const url = res && (res.url != null ? res.url : res);
           const personalInfo = this.data.personalInfo || {};
           const payload = {
             name: personalInfo.name,

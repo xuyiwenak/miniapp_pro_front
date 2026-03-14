@@ -44,15 +44,17 @@ Page({
       const uploaded = await Promise.all(
         newlyAdded.map(async (item) => {
           const tempPath = item.url || item.tempFilePath;
-          const url = await uploadImage(tempPath);
+          const { url, cdnUrl } = await uploadImage(tempPath);
           return {
-            url,
+            url: cdnUrl || url,
+            storedUrl: url,
             name: item.name || 'image',
             type: 'image',
           };
         }),
       );
-      const others = (files || []).filter((f) => !f.url || !f.url.startsWith('wxfile://'));
+      const isTempPath = (u) => !u || u.startsWith('wxfile://') || u.startsWith('http://tmp/');
+      const others = (files || []).filter((f) => f.url && !isTempPath(f.url));
       const originFiles = others.concat(uploaded);
       this.setData({ originFiles });
     } catch (err) {
@@ -88,10 +90,15 @@ Page({
   },
   async saveDraft() {
     try {
+      const images = (this.data.originFiles || []).map((f) => ({
+        url: f.storedUrl || f.url,
+        name: f.name || 'image',
+        type: f.type || 'image',
+      }));
       const payload = {
         desc: this.data.desc || '',
         tags: this.data.selectedTags || [],
-        images: this.data.originFiles || [],
+        images,
         status: 'draft',
       };
       await request('/work/publish', 'POST', { data: payload });
@@ -107,10 +114,15 @@ Page({
   },
   async release() {
     try {
+      const images = (this.data.originFiles || []).map((f) => ({
+        url: f.storedUrl || f.url,
+        name: f.name || 'image',
+        type: f.type || 'image',
+      }));
       const payload = {
         desc: this.data.desc || '',
         tags: this.data.selectedTags || [],
-        images: this.data.originFiles || [],
+        images,
         status: 'published',
       };
       wx.showToast({
