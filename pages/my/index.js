@@ -1,7 +1,7 @@
 import request from '~/api/request';
 import { uploadImage } from '~/api/upload';
 import useToastBehavior from '~/behaviors/useToast';
-import { MBTI_META } from '~/pages/mbti/mbtiConfig';
+import { MBTI_META } from '~/utils/mbtiConfig';
 
 const STAR_EMOJI_MAP = {
   白羊座: '♈', 金牛座: '♉', 双子座: '♊', 巨蟹座: '♋',

@@ -1,4 +1,4 @@
-// 16 型 MBTI 配色与图标配置
+// 16 型 MBTI 配色与图标配置（主包共享，供「我的」页与 MBTI 分包使用）
 
 export const MBTI_META = {
   INTJ: { name: '建筑师', emoji: '🏛', c1: '#2d1b69', c2: '#6c3fc5', glow: 'rgba(108, 63, 197, 0.55)' },
@@ -30,4 +30,3 @@ export function getMbtiStyle(type) {
   const style = `--mbti-c1:${meta.c1};--mbti-c2:${meta.c2};--mbti-glow:${meta.glow};`;
   return { style, emoji: meta.emoji, name: meta.name };
 }
-

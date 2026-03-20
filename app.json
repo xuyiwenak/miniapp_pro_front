@@ -1,15 +1,28 @@
 {
+  "lazyCodeLoading": "requiredComponents",
   "pages": [
     "pages/home/index",
-    "pages/workDetail/index",
-    "pages/my/index",
-    "pages/feedback/index",
-    "pages/mbti/index"
+    "pages/my/index"
   ],
   "usingComponents": {
     "t-toast": "tdesign-miniprogram/toast/toast"
   },
   "subpackages": [
+    {
+      "root": "pages/workDetail",
+      "name": "workDetail",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/feedback",
+      "name": "feedback",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/mbti",
+      "name": "mbti",
+      "pages": ["index"]
+    },
     {
       "root": "pages/my/info-edit",
       "name": "edit",

@@ -1,6 +1,6 @@
 import request from '~/api/request';
 import { MBTI_QUESTIONS, MBTI_OPTIONS } from './questions';
-import { getMbtiStyle } from './mbtiConfig';
+import { getMbtiStyle } from '~/utils/mbtiConfig';
 
 function calcMBTIWithDetail(answers) {
   const scores = { EI: 0, NS: 0, TF: 0, JP: 0 };
