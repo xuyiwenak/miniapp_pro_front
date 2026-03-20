@@ -1,7 +1,5 @@
 import config from '~/config';
 
-const { baseUrl } = config;
-
 export function uploadImage(tempFilePath) {
   return new Promise((resolve, reject) => {
     if (!tempFilePath) {
@@ -20,7 +18,7 @@ export function uploadImage(tempFilePath) {
           header.Authorization = `Bearer ${tokenString}`;
         }
         wx.uploadFile({
-          url: `${baseUrl}/api/upload`,
+          url: `${config.baseUrl}/api/upload`,
           filePath,
           name: 'file',
           header,

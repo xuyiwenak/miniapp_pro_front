@@ -1,6 +1,5 @@
 import config from '~/config';
 
-const { baseUrl } = config;
 const delay = config.isMock ? 500 : 0;
 function request(url, method = 'GET', data = {}) {
   const header = {
@@ -14,7 +13,7 @@ function request(url, method = 'GET', data = {}) {
   }
   return new Promise((resolve, reject) => {
     wx.request({
-      url: baseUrl + url,
+      url: config.baseUrl + url,
       method,
       data,
       dataType: 'json', // 微信官方文档中介绍会对数据进行一次JSON.parse
