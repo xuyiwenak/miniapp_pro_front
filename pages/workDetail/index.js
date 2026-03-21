@@ -1,4 +1,10 @@
 import request from '~/api/request';
+import config from '~/config';
+
+function apiBaseToWsUrl(apiBase) {
+  if (!apiBase) return '';
+  return apiBase.replace(/^https:\/\//i, 'wss://').replace(/^http:\/\//i, 'ws://');
+}
 
 Page({
   data: {
@@ -109,6 +115,7 @@ Page({
 
     if (healingStatus === 'pending') {
       this.setData({ healingLoading: true });
+      this._startHealingPush();
       this._pollStatus(this.data.workId);
     }
   },
@@ -118,6 +125,121 @@ Page({
       clearTimeout(this._pollTimer);
       this._pollTimer = null;
     }
+    this._stopHealingPush();
+  },
+
+  /** Coze 回调写库后服务端经 WS 推送，收到后立即拉 /healing/status */
+  _startHealingPush() {
+    if (this._healingPushActive || !this.data.workId) return;
+    const token = wx.getStorageSync('access_token');
+    if (!token) return;
+
+    this._healingPushActive = true;
+    const wsUrl = `${apiBaseToWsUrl(config.baseUrl)}/chat?token=${encodeURIComponent(token)}`;
+
+    try {
+      this._socketTask = wx.connectSocket({ url: wsUrl });
+    } catch (e) {
+      this._healingPushActive = false;
+      return;
+    }
+
+    if (!this._socketTask || typeof this._socketTask.onMessage !== 'function') {
+      this._healingPushActive = false;
+      return;
+    }
+
+    this._socketTask.onMessage((res) => {
+      let raw = res.data;
+      if (typeof raw !== 'string') {
+        try {
+          raw = JSON.stringify(raw);
+        } catch (e) {
+          return;
+        }
+      }
+      let msg;
+      try {
+        msg = JSON.parse(raw);
+      } catch (e) {
+        return;
+      }
+      if (msg.type !== 'healing_update' || !msg.data || msg.data.workId !== this.data.workId) {
+        return;
+      }
+      if (msg.data.status === 'failed') {
+        if (this._pollTimer) {
+          clearTimeout(this._pollTimer);
+          this._pollTimer = null;
+        }
+        this.setData({
+          healingLoading: false,
+          healingStatus: 'none',
+          healingError: '分析失败，请稍后重试',
+        });
+        wx.showToast({ title: '分析失败', icon: 'none' });
+        this._stopHealingPush();
+        return;
+      }
+      if (msg.data.status === 'success') {
+        if (this._pollTimer) {
+          clearTimeout(this._pollTimer);
+          this._pollTimer = null;
+        }
+        request('/healing/status', 'GET', { workId: this.data.workId })
+          .then((r) => {
+            if (this._applyHealingSuccessFromStatusRes(r)) {
+              this._stopHealingPush();
+            }
+          })
+          .catch(() => {});
+      }
+    });
+
+    this._socketTask.onClose(() => {
+      this._socketTask = null;
+      this._healingPushActive = false;
+    });
+
+    this._socketTask.onError(() => {
+      this._healingPushActive = false;
+    });
+  },
+
+  _stopHealingPush() {
+    if (this._socketTask) {
+      try {
+        this._socketTask.close({});
+      } catch (e) {}
+      this._socketTask = null;
+    }
+    this._healingPushActive = false;
+  },
+
+  _applyHealingSuccessFromStatusRes(res) {
+    const body = res.data || res;
+    const status = body.status || body.data?.status;
+    if (status !== 'success') return false;
+    const data = body.data || body;
+    this.setData({
+      healingLoading: false,
+      healingAnalyzed: true,
+      healingVisible: true,
+      healingStatus: 'success',
+      healingScores: data.scores || null,
+      healingSummary: data.summary || '',
+      healingColorAnalysis: data.colorAnalysis || '',
+      healingDominantEmotion: data.dominantEmotion || '',
+      healingDominantEmotionLabel: data.dominantEmotionLabel || '',
+      healingDominantEmotionScore: data.dominantEmotionScore || 0,
+      healingIsPublic: data.isPublic !== false,
+      healingCompositionReport: data.compositionReport || '',
+      healingLineAnalysis: data.lineAnalysis || null,
+      healingSuggestion: data.suggestion || '',
+      healingKeyColors: data.keyColors || [],
+    });
+    wx.showToast({ title: '分析完成', icon: 'success' });
+    return true;
   },
 
   async onAnalyzeTap() {
@@ -134,6 +256,8 @@ Page({
 
     try {
       await request('/healing/analyze', 'POST', { data: { workId } });
+      this._stopHealingPush();
+      this._startHealingPush();
       this._pollStatus(workId);
     } catch (err) {
       const message = (err && err.message) || err?.data?.message || '提交分析失败';
@@ -156,25 +280,8 @@ Page({
         const status = body.status || body.data?.status;
 
         if (status === 'success') {
-          const data = body.data || body;
-          this.setData({
-            healingLoading: false,
-            healingAnalyzed: true,
-            healingVisible: true,
-            healingStatus: 'success',
-            healingScores: data.scores || null,
-            healingSummary: data.summary || '',
-            healingColorAnalysis: data.colorAnalysis || '',
-            healingDominantEmotion: data.dominantEmotion || '',
-            healingDominantEmotionLabel: data.dominantEmotionLabel || '',
-            healingDominantEmotionScore: data.dominantEmotionScore || 0,
-            healingIsPublic: data.isPublic !== false,
-            healingCompositionReport: data.compositionReport || '',
-            healingLineAnalysis: data.lineAnalysis || null,
-            healingSuggestion: data.suggestion || '',
-            healingKeyColors: data.keyColors || [],
-          });
-          wx.showToast({ title: '分析完成', icon: 'success' });
+          this._applyHealingSuccessFromStatusRes(res);
+          this._stopHealingPush();
           return;
         }
 
@@ -185,12 +292,13 @@ Page({
             healingError: '分析失败，请稍后重试',
           });
           wx.showToast({ title: '分析失败', icon: 'none' });
+          this._stopHealingPush();
           return;
         }
 
-        this._pollTimer = setTimeout(poll, 5000);
+        this._pollTimer = setTimeout(poll, 8000);
       } catch {
-        this._pollTimer = setTimeout(poll, 5000);
+        this._pollTimer = setTimeout(poll, 8000);
       }
     };
 
