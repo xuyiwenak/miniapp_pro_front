@@ -1,6 +1,11 @@
 import request from '~/api/request';
 import config from '~/config';
 
+/** pending 时轮询 /healing/status：首包稍快，之后拉长间隔，减轻服务端压力（Coze 常需数分钟） */
+const HEALING_POLL_FIRST_MS = 6000;
+const HEALING_POLL_MIN_INTERVAL_MS = 12000;
+const HEALING_POLL_MAX_INTERVAL_MS = 45000;
+
 function apiBaseToWsUrl(apiBase) {
   if (!apiBase) return '';
   return apiBase.replace(/^https:\/\//i, 'wss://').replace(/^http:\/\//i, 'ws://');
@@ -272,6 +277,7 @@ Page({
 
   _pollStatus(workId) {
     if (this._pollTimer) clearTimeout(this._pollTimer);
+    this._healingPollIntervalMs = HEALING_POLL_MIN_INTERVAL_MS;
 
     const poll = async () => {
       try {
@@ -296,13 +302,23 @@ Page({
           return;
         }
 
-        this._pollTimer = setTimeout(poll, 8000);
+        const nextMs = Math.min(
+          Math.round(this._healingPollIntervalMs * 1.35),
+          HEALING_POLL_MAX_INTERVAL_MS,
+        );
+        this._healingPollIntervalMs = nextMs;
+        this._pollTimer = setTimeout(poll, nextMs);
       } catch {
-        this._pollTimer = setTimeout(poll, 8000);
+        const nextMs = Math.min(
+          Math.round((this._healingPollIntervalMs || HEALING_POLL_MIN_INTERVAL_MS) * 1.2),
+          HEALING_POLL_MAX_INTERVAL_MS,
+        );
+        this._healingPollIntervalMs = nextMs;
+        this._pollTimer = setTimeout(poll, nextMs);
       }
     };
 
-    this._pollTimer = setTimeout(poll, 3000);
+    this._pollTimer = setTimeout(poll, HEALING_POLL_FIRST_MS);
   },
 
   async onTogglePrivacy(e) {
