@@ -1,7 +1,7 @@
 <nav title-text="范例展示" />
 <view class="home-container">
   <scroll-view
-    class="home-content"
+    class="home-scroll"
     scroll-y
     enhanced
     refresher-enabled
@@ -9,22 +9,37 @@
     refresher-default-style="black"
     bindrefresherrefresh="onPullDownRefresh"
   >
-    <swiper class="home-swiper" vertical="true" circular="false" indicator-dots="false">
-      <swiper-item
+    <view class="home-grid" wx:if="{{cardInfo.length > 0}}">
+      <view
+        class="home-grid__item"
         wx:for="{{cardInfo}}"
         wx:key="workId"
-        data-work-id="{{item.workId}}"
         bindtap="onCardTap"
+        data-work-id="{{item.workId}}"
       >
-        <view class="home-swiper__item">
-          <card
-            desc="{{item.desc}}"
-            url="{{item.url}}"
-            tags="{{item.tags}}"
-          />
+        <view class="home-grid__img-wrap">
+          <image class="home-grid__image" src="{{item.url}}" mode="aspectFill" lazy-load />
         </view>
-      </swiper-item>
-    </swiper>
+        <view class="home-grid__info">
+          <text class="home-grid__title">{{item.desc || '无标题作品'}}</text>
+          <view class="home-grid__tags" wx:if="{{item.tags && item.tags.length}}">
+            <text
+              class="home-grid__tag"
+              wx:for="{{item.tags}}"
+              wx:for-item="tag"
+              wx:key="text"
+            >{{tag.text}}</text>
+          </view>
+          <view class="home-grid__author">
+            <view class="home-grid__avatar" />
+            <text class="home-grid__nickname">{{item.nickname || '匿名'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="home-empty" wx:else>
+      <text>加载中...</text>
+    </view>
   </scroll-view>
 </view>
 

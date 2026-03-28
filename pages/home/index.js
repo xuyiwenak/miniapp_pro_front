@@ -7,24 +7,13 @@ import request from '~/api/request';
 Page({
   data: {
     refreshing: false,
-    swiperList: [],
     cardInfo: [],
   },
   // 生命周期
   async onReady() {
-    const [cardRes, swiperRes] = await Promise.all([
-      request('/home/cards').then((res) => res.data),
-      request('/home/swipers').then((res) => res.data),
-    ]);
-
+    const cardRes = await request('/home/cards').then((res) => res.data);
     const cards = Array.isArray(cardRes) ? cardRes : cardRes?.data || [];
-    const swipers = Array.isArray(swiperRes) ? swiperRes : swiperRes?.data || [];
-
-    this.setData({
-      cardInfo: cards,
-      focusCardInfo: cards.slice(0, 3),
-      swiperList: swipers,
-    });
+    this.setData({ cardInfo: cards });
   },
   onLoad(option) {
     if (option.oper) {
@@ -40,14 +29,10 @@ Page({
   async onPullDownRefresh() {
     this.setData({ refreshing: true });
     try {
-      const [cardRes, swiperRes] = await Promise.all([
-        request('/home/cards').then((res) => res.data),
-        request('/home/swipers').then((res) => res.data),
-      ]);
+      const cardRes = await request('/home/cards').then((res) => res.data);
       const cards = Array.isArray(cardRes) ? cardRes : cardRes?.data || [];
-      const swipers = Array.isArray(swiperRes) ? swiperRes : swiperRes?.data || [];
-      this.setData({ cardInfo: cards, swiperList: swipers });
-    } catch (err) {
+      this.setData({ cardInfo: cards });
+    } catch {
       wx.showToast({ title: '刷新失败', icon: 'none' });
     }
     setTimeout(() => this.setData({ refreshing: false }), 600);
