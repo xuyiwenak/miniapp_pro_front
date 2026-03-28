@@ -2,7 +2,6 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "t-message": "tdesign-miniprogram/message/message",
-    "nav": "/components/nav",
-    "card": "/components/card"
+    "nav": "/components/nav"
   }
 }
