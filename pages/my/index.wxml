@@ -14,14 +14,19 @@
   <view class="profile-section">
     <!-- 已登录 -->
     <block wx:if="{{isLoad}}">
-      <!-- 第一行：头像 + 编辑按钮 -->
+      <!-- 第一行：头像 + 编辑按钮 + 齿轮 -->
       <view class="profile-row-top">
         <view class="profile-avatar" bindtap="onAvatarTap">
           <t-avatar image="{{personalInfo.image}}" size="144rpx" />
         </view>
-        <view class="profile-edit-btn" bindtap="onNavigateTo">
-          <t-icon name="edit" size="28rpx" color="#333" />
-          <text>编辑资料</text>
+        <view class="profile-actions">
+          <view class="profile-edit-btn" bindtap="onNavigateTo">
+            <t-icon name="edit" size="28rpx" color="#333" />
+            <text>编辑资料</text>
+          </view>
+          <view class="profile-setting-btn" bindtap="onSettingTap">
+            <t-icon name="setting" size="40rpx" color="#555" />
+          </view>
         </view>
       </view>
 
@@ -57,35 +62,40 @@
     </block>
   </view>
 
-  <!-- 功能区 -->
-  <view class="func-section" style="position: relative; left: 0rpx; top: 35rpx">
-    <view class="func-grid">
+  <!-- Tab 栏 + 内容区 -->
+  <view class="func-section">
+    <!-- XHS 风格 Tab -->
+    <view class="tab-bar">
       <view
-        class="func-grid__item"
-        wx:for="{{gridList}}"
-        wx:key="type"
-        data-data="{{item}}"
-        bindtap="onEleClick"
+        class="tab-bar__item {{activeTab === index ? 'tab-bar__item--active' : ''}}"
+        wx:for="{{tabs}}"
+        wx:key="*this"
+        bindtap="onTabTap"
+        data-index="{{index}}"
       >
-        <view class="func-grid__icon func-grid__icon--{{index}}">
-          <t-icon name="{{item.icon}}" size="44rpx" color="#333" />
-        </view>
-        <text class="func-grid__label">{{item.name}}</text>
+        <text class="tab-bar__label">{{item}}</text>
+        <view class="tab-bar__line" wx:if="{{activeTab === index}}" />
       </view>
     </view>
 
-    <!-- 设置列表 -->
-    <view class="cell-list">
-      <view
-        class="cell-list__item"
-        wx:for="{{settingList}}"
-        wx:key="type"
-        data-data="{{item}}"
-        bindtap="onEleClick"
-      >
-        <t-icon name="{{item.icon}}" size="36rpx" color="#666" />
-        <text class="cell-list__text">{{item.name}}</text>
-        <t-icon name="chevron-right" size="32rpx" color="#ccc" />
+    <!-- 作品列表（已上传 / 草稿箱） -->
+    <view class="work-grid" wx:if="{{activeTab !== 2}}">
+      <view class="work-grid__loading" wx:if="{{worksLoading}}">加载中...</view>
+      <view class="work-grid__empty" wx:elif="{{!workList.length}}">暂无作品</view>
+      <view class="work-grid__list" wx:else>
+        <view
+          class="work-grid__item"
+          wx:for="{{workList}}"
+          wx:for-item="work"
+          wx:key="workId"
+          bindtap="onWorkTap"
+          data-work-id="{{work.workId}}"
+        >
+          <view class="work-grid__img-wrap">
+            <image class="work-grid__img" src="{{work.coverUrl}}" mode="aspectFill" lazy-load />
+          </view>
+          <view class="work-grid__desc">{{work.desc || '无标题作品'}}</view>
+        </view>
       </view>
     </view>
   </view>

@@ -9,87 +9,89 @@ const STAR_EMOJI_MAP = {
   射手座: '♐', 摩羯座: '♑', 水瓶座: '♒', 双鱼座: '♓',
 };
 
+const TAB_MODES = ['published', 'draft', 'healing'];
+
 Page({
   behaviors: [useToastBehavior],
 
   data: {
     isLoad: false,
     personalInfo: {},
-    gridList: [
-      {
-        name: '已上传',
-        icon: 'upload',
-        type: 'published',
-        url: '',
-      },
-      {
-        name: '草稿箱',
-        icon: 'file-copy',
-        type: 'draft',
-        url: '',
-      },
-      {
-        name: '已分析',
-        icon: 'chart-radar',
-        type: 'healing',
-        url: '/pages/ai-list/index',
-      },
-      {
-        name: '问题反馈',
-        icon: 'service',
-        type: 'service',
-        url: '/pages/feedback/index',
-      },
-    ],
-
-    settingList: [
-      { name: '退出登录', icon: 'poweroff', type: 'logout', url: '' },
-    ],
+    tabs: ['已上传', '草稿箱', '已分析'],
+    activeTab: 0,
+    workList: [],
+    worksLoading: false,
   },
 
   async onShow() {
     const Token = wx.getStorageSync('access_token');
     if (!Token) {
-      this.setData({
-        isLoad: false,
-        personalInfo: {},
-      });
+      this.setData({ isLoad: false, personalInfo: {} });
       return;
     }
     try {
       const personalInfo = await this.getPersonalInfo();
-      this.setData({
-        isLoad: true,
-        personalInfo,
-      });
+      this.setData({ isLoad: true, personalInfo });
+      this.fetchWorks(TAB_MODES[this.data.activeTab]);
     } catch {
-      // 如果请求失败（例如 token 失效），视为未登录状态
-      this.setData({
-        isLoad: false,
-        personalInfo: {},
-      });
+      this.setData({ isLoad: false, personalInfo: {} });
     }
   },
 
   async getPersonalInfo() {
     const info = await request('/api/genPersonalInfo').then((res) => res.data.data);
-    if (info && info.star) {
-      info.starEmoji = STAR_EMOJI_MAP[info.star] || '';
-    }
-    if (info && info.mbti) {
-      info.mbtiEmoji = (MBTI_META[info.mbti] && MBTI_META[info.mbti].emoji) || '';
-    }
+    if (info && info.star) info.starEmoji = STAR_EMOJI_MAP[info.star] || '';
+    if (info && info.mbti) info.mbtiEmoji = (MBTI_META[info.mbti] && MBTI_META[info.mbti].emoji) || '';
     return info;
   },
 
-  onLogin(e) {
-    wx.navigateTo({
-      url: '/pages/login/login',
-    });
+  async fetchWorks(mode) {
+    if (mode === 'healing') return;
+    this.setData({ worksLoading: true, workList: [] });
+    try {
+      const res = await request('/work/list', 'GET', { status: mode });
+      const body = res.data || res;
+      const list = Array.isArray(body) ? body : body?.data || [];
+      const workList = list.map((item) => ({
+        ...item,
+        coverUrl: item.coverUrl || item.images?.[0]?.url || '',
+      }));
+      this.setData({ workList, worksLoading: false });
+    } catch {
+      this.setData({ worksLoading: false });
+    }
+  },
+
+  onTabTap(e) {
+    const index = e.currentTarget.dataset.index;
+    if (index === this.data.activeTab) return;
+    if (index === 2) {
+      wx.navigateTo({ url: '/pages/ai-list/index' });
+      return;
+    }
+    this.setData({ activeTab: index });
+    this.fetchWorks(TAB_MODES[index]);
+  },
+
+  onWorkTap(e) {
+    const workId = e.currentTarget.dataset.workId;
+    if (!workId) return;
+    const source = this.data.activeTab === 1 ? 'my' : '';
+    let url = `/pages/workDetail/index?workId=${encodeURIComponent(workId)}`;
+    if (source) url += `&source=${source}`;
+    wx.navigateTo({ url });
+  },
+
+  onSettingTap() {
+    wx.navigateTo({ url: '/pages/setting/index' });
+  },
+
+  onLogin() {
+    wx.navigateTo({ url: '/pages/login/login' });
   },
 
   onNavigateTo() {
-    wx.navigateTo({ url: `/pages/my/info-edit/index` });
+    wx.navigateTo({ url: '/pages/my/info-edit/index' });
   },
 
   onMbtiTap() {
@@ -99,9 +101,7 @@ Page({
       confirmText: '开始',
       cancelText: '取消',
       success(res) {
-        if (res.confirm) {
-          wx.navigateTo({ url: '/pages/mbti/index' });
-        }
+        if (res.confirm) wx.navigateTo({ url: '/pages/mbti/index' });
       },
     });
   },
@@ -115,8 +115,8 @@ Page({
         const tempPath = res.tempFiles[0].tempFilePath;
         wx.showLoading({ title: '上传中...' });
         try {
-          const res = await uploadImage(tempPath);
-          const url = res && (res.url != null ? res.url : res);
+          const uploadRes = await uploadImage(tempPath);
+          const url = uploadRes && (uploadRes.url != null ? uploadRes.url : uploadRes);
           const personalInfo = this.data.personalInfo || {};
           const payload = {
             name: personalInfo.name,
@@ -136,53 +136,12 @@ Page({
           } else {
             wx.showToast({ title: '保存成功', icon: 'success' });
           }
-        } catch (err) {
+        } catch {
           wx.showToast({ title: '上传或保存失败', icon: 'none' });
         } finally {
           wx.hideLoading();
         }
       },
     });
-  },
-
-  onEleClick(e) {
-    const { name, url, type } = e.currentTarget.dataset.data;
-    if (type === 'published') {
-      wx.navigateTo({ url: '/pages/work-list/index?mode=published' });
-      return;
-    }
-    if (type === 'draft') {
-      wx.navigateTo({ url: '/pages/work-list/index?mode=draft' });
-      return;
-    }
-    if (type === 'healing') {
-      wx.navigateTo({ url: '/pages/ai-list/index' });
-      return;
-    }
-    if (type === 'service') {
-      wx.navigateTo({ url: '/pages/feedback/index' });
-      return;
-    }
-    if (type === 'logout') {
-      // 调用后端注销当前 token
-      const token = wx.getStorageSync('access_token');
-      if (token) {
-        request('/login/logout', 'POST').catch(() => {
-          // 忽略后端错误，继续执行前端退出流程
-        });
-      }
-      wx.removeStorageSync('access_token');
-      this.setData({
-        isLoad: false,
-        personalInfo: {},
-      });
-      wx.navigateTo({ url: '/pages/login/login' });
-      return;
-    }
-    if (url) {
-      wx.navigateTo({ url });
-      return;
-    }
-    this.onShowToast('#t-toast', name);
   },
 });
