@@ -23,7 +23,7 @@ Page({
     healingAnalyzed: false,
     healingVisible: false,
     healingStatus: 'none', // none | pending | success
-    healingIsPublic: true,
+    healingIsPublic: false,
     healingScores: null,
     healingSummary: '',
     healingColorAnalysis: '',
@@ -82,7 +82,7 @@ Page({
         healingVisible: false,
         healingStatus: 'none',
         healingScores: null,
-        isOwner: !!work?.isOwner,
+        isOwner: !!work?.isOwner || this.data.source === 'my',
       });
       return;
     }
@@ -321,9 +321,19 @@ Page({
     this._pollTimer = setTimeout(poll, HEALING_POLL_FIRST_MS);
   },
 
+  async onTogglePrivacyTap() {
+    const { healingIsPublic, healingStatus, healingAnalyzed } = this.data;
+    // 未分析时后端还没有 healing 记录，仅切换本地预设状态
+    if (healingStatus === 'none' && !healingAnalyzed) {
+      this.setData({ healingIsPublic: !healingIsPublic });
+      return;
+    }
+    await this.onTogglePrivacy({ detail: { value: !healingIsPublic } });
+  },
+
   async onTogglePrivacy(e) {
-    const { workId } = this.data;
-    if (!workId || !this.data.healingAnalyzed) return;
+    const { workId, healingAnalyzed, healingStatus } = this.data;
+    if (!workId || (!healingAnalyzed && healingStatus !== 'pending')) return;
     const nextValue = !!e.detail?.value;
     const prevValue = !!this.data.healingIsPublic;
 

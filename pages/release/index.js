@@ -17,7 +17,7 @@ Page({
   data: {
     originFiles: [],
     gridConfig: {
-      column: 4,
+      column: 1,
       width: 160,
       height: 160,
     },
@@ -41,14 +41,24 @@ Page({
   },
   async handleSuccess(e) {
     const { files, currentFiles } = e.detail || {};
-    // TDesign 有时只传 files 不传 currentFiles，用“无 storedUrl 的项”视为本次新选待上传
-    const newlyAdded =
+    // TDesign 有时只传 files 不传 currentFiles，用”无 storedUrl 的项”视为本次新选待上传
+    let newlyAdded =
       (currentFiles && currentFiles.length) > 0
         ? currentFiles
         : (files || []).filter((f) => !f.storedUrl);
     if (!newlyAdded.length) {
       this.setData({ originFiles: (files || []).filter((f) => f.storedUrl) });
       return;
+    }
+    // 每次只允许上传一张
+    if (newlyAdded.length > 1) {
+      wx.showModal({
+        title: '提示',
+        content: '每次只能上传一张图片',
+        showCancel: false,
+        confirmText: '知道了',
+      });
+      newlyAdded = newlyAdded.slice(0, 1);
     }
     wx.showLoading({ title: '上传中...' });
     try {
@@ -65,8 +75,9 @@ Page({
           };
         }),
       );
+      // 保留已存储的文件，再合并本次上传，总数截断为 1
       const others = (files || []).filter((f) => f.storedUrl);
-      this.setData({ originFiles: others.concat(uploaded) });
+      this.setData({ originFiles: others.concat(uploaded).slice(0, 1) });
     } catch (err) {
       const msg = (err && err.code === 401) ? '请先登录' : '图片上传失败';
       wx.showToast({ title: msg, icon: 'none' });
@@ -154,7 +165,10 @@ Page({
       const res = await request('/work/publish', 'POST', { data: payload });
       wx.hideLoading();
       if (res && (res.success || res.data)) {
-        wx.showToast({ title: '发布成功', icon: 'success' });
+        wx.showToast({ title: '发布成功', icon: 'success', duration: 1500 });
+        setTimeout(() => {
+          wx.reLaunch({ url: '/pages/work-list/index' });
+        }, 1500);
       } else {
         wx.showToast({ title: '发布失败', icon: 'none' });
       }

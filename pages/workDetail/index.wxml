@@ -22,16 +22,40 @@
       </view>
       <view class="work-detail__ai-action">
         <block wx:if="{{healingStatus === 'none' && !healingLoading}}">
-          <text class="work-detail__ai-status">未做内容分析</text>
-          <button class="work-detail__ai-button" size="mini" bindtap="onAnalyzeTap">点击分析</button>
+          <block wx:if="{{isOwner}}">
+            <text class="work-detail__ai-status">未做内容分析</text>
+            <button class="work-detail__ai-button" size="mini" bindtap="onAnalyzeTap">点击分析</button>
+            <view class="work-detail__ai-privacy-toggle" bindtap="onTogglePrivacyTap">
+              <t-icon name="{{healingIsPublic ? 'browse' : 'browse-off'}}" size="40rpx" class="work-detail__ai-eye-icon work-detail__ai-eye-icon--tap" />
+            </view>
+          </block>
+          <block wx:else>
+            <t-icon name="browse-off" size="32rpx" class="work-detail__ai-eye-icon" />
+            <text class="work-detail__ai-status work-detail__ai-status--muted">分析不可见</text>
+          </block>
         </block>
         <block wx:elif="{{healingStatus === 'pending' || healingLoading}}">
-          <text class="work-detail__ai-status">分析中...</text>
+          <block wx:if="{{isOwner}}">
+            <text class="work-detail__ai-status">分析中...</text>
+            <view class="work-detail__ai-privacy-toggle" bindtap="onTogglePrivacyTap">
+              <t-icon name="{{healingIsPublic ? 'browse' : 'browse-off'}}" size="40rpx" class="work-detail__ai-eye-icon work-detail__ai-eye-icon--tap" />
+            </view>
+          </block>
+          <block wx:else>
+            <t-icon name="browse-off" size="32rpx" class="work-detail__ai-eye-icon" />
+            <text class="work-detail__ai-status work-detail__ai-status--muted">分析不可见</text>
+          </block>
         </block>
         <block wx:elif="{{healingAnalyzed && !healingVisible}}">
-          <text class="work-detail__ai-status work-detail__ai-status--muted">
-            作者将本次疗愈分析设为私密，仅自己可见
-          </text>
+          <block wx:if="{{isOwner}}">
+            <view class="work-detail__ai-privacy-toggle" bindtap="onTogglePrivacyTap">
+              <t-icon name="{{healingIsPublic ? 'browse' : 'browse-off'}}" size="40rpx" class="work-detail__ai-eye-icon work-detail__ai-eye-icon--tap" />
+            </view>
+          </block>
+          <block wx:else>
+            <t-icon name="browse-off" size="32rpx" class="work-detail__ai-eye-icon" />
+            <text class="work-detail__ai-status work-detail__ai-status--muted">分析不可见</text>
+          </block>
         </block>
         <block wx:elif="{{healingAnalyzed && healingVisible && healingScores}}">
           <text class="work-detail__ai-status">
