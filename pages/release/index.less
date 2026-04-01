@@ -56,7 +56,7 @@ page {
 
   // 描述文本区 — 白色卡片
   .desc {
-    height: 132rpx * 2;
+    min-height: 132rpx * 2;
     display: flex;
     padding: 32rpx;
     align-items: flex-start;
@@ -67,28 +67,45 @@ page {
     margin-bottom: 20rpx;
     .desc-class {
       width: 246rpx * 2;
-      height: 100%;
+      min-height: 132rpx * 2;
       padding: 0;
     }
   }
 
-  // 标签区 — 白色卡片
+  // 标签区 — 白色卡片（自定义布局，无 t-cell 分割线）
   .taggroup {
     background: #fff;
     border-radius: 20rpx;
-    overflow: hidden;
     margin-bottom: 20rpx;
-    .cell-title-class {
-      width: 81rpx * 2;
+  }
+
+  .tag-row {
+    display: flex;
+    align-items: center;
+    padding: 28rpx 32rpx;
+
+    &__label {
+      font-size: 28rpx;
+      font-weight: 500;
       color: #1B3A6B;
+      flex-shrink: 0;
+      width: 162rpx;
     }
-    .cell-note-class {
-      overflow-x: auto;
-      justify-content: start;
+
+    &__scroll {
+      flex: 1;
     }
-    .tag-class {
-      margin-left: 24rpx;
+
+    &__inner {
+      display: flex;
+      align-items: center;
+      gap: 16rpx;
+      white-space: nowrap;
     }
+  }
+
+  .tag-class {
+    flex-shrink: 0;
   }
 
   .btngroup {
@@ -96,7 +113,7 @@ page {
     justify-content: space-evenly;
     padding: 32rpx;
     position: fixed;
-    bottom: 64rpx;
+    bottom: calc(64rpx + env(safe-area-inset-bottom));
     .btn-class {
       width: 163.5rpx * 2;
       margin: 0;

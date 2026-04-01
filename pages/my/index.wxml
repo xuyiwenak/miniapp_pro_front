@@ -38,6 +38,7 @@
       class="profile-bg__img"
       src="{{personalInfo.photos[0].url || '/static/img_td.png'}}"
       mode="aspectFill"
+      aria-hidden="true"
     />
     <view class="profile-bg__mask" />
   </view>
@@ -124,7 +125,7 @@
           data-work-id="{{work.workId}}"
         >
           <view class="work-grid__img-wrap">
-            <image class="work-grid__img" src="{{work.coverUrl}}" mode="aspectFill" lazy-load />
+            <image class="work-grid__img" src="{{work.coverUrl}}" mode="aspectFill" lazy-load aria-label="{{work.desc || '作品图片'}}" />
           </view>
           <view class="work-grid__desc">{{work.desc || '无标题作品'}}</view>
         </view>

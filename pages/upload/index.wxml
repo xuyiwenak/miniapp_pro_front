@@ -15,7 +15,7 @@
       </text>
       <text wx:if="{{draftStar}}" class="ob-birth-star">{{draftStar}}</text>
     </view>
-    <text class="ob-birth-hint">填写生日后，AI 可以结合星座解读作品</text>
+    <text class="ob-birth-hint">填写生日后，可以结合星座解读作品</text>
 
     <view class="ob-actions">
       <view class="ob-btn ob-btn--ghost" bindtap="onSkipNickname">跳过</view>
@@ -49,7 +49,7 @@
       <text class="privacy-popup__text">
 一、信息收集与使用
 
-我们仅收集您在使用本平台服务时主动上传的作品图片、昵称、生日等信息，用于提供心灵疗愈分析服务。
+我们仅收集您在使用本平台服务时主动上传的作品图片、昵称、生日等信息，用于提供分析服务。
 
 二、作品使用承诺
 
@@ -82,7 +82,7 @@
   <!-- 问候语 -->
   <view class="upload-greeting" wx:if="{{userName}}">
     <text class="upload-greeting__hi">Hi {{userName}}，你好 👋</text>
-    <text class="upload-greeting__sub">欢迎来到心灵艺术工坊</text>
+    <text class="upload-greeting__sub">欢迎来到原色有感疗愈空间</text>
   </view>
 
   <!-- 每日上传限制提示 -->
@@ -120,7 +120,7 @@
   <!-- 商业用途承诺 -->
   <view class="upload-pledge">
     <text class="upload-pledge__icon">🔒</text>
-    <text class="upload-pledge__text">我们承诺：您上传的作品仅用于本平台心灵疗愈分析，不会用于任何商业用途，更不会在未经授权的情况下对外展示或转让。</text>
+    <text class="upload-pledge__text">我们承诺：您上传的作品仅用于本平台疗愈分析，不会用于任何商业用途，更不会在未经授权的情况下对外展示或转让。</text>
   </view>
 
   <!-- 隐私协议勾选 -->
