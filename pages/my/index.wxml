@@ -1,5 +1,37 @@
 <t-toast id="t-toast" />
 
+<!-- MBTI 引导弹窗（昵称引导完成后触发，可跳过） -->
+<view class="ob-mask" wx:if="{{showMbtiGuide}}">
+  <view class="ob-card">
+    <block wx:if="{{mbtiGuideMode === 'select'}}">
+      <text class="ob-title">✨ 完善你的人格档案</text>
+      <text class="ob-subtitle">添加 MBTI 让大家更了解你，也可以稍后再填</text>
+      <view class="ob-tags">
+        <view
+          wx:for="{{mbtiOptions}}" wx:key="*this"
+          class="ob-tag {{draftMbti === item ? 'ob-tag--active' : ''}}"
+          data-mbti="{{item}}" bindtap="onMbtiGuideSelect">{{item}}</view>
+      </view>
+      <view class="ob-hint" bindtap="onSwitchMbtiTest">不知道自己的 MBTI？去测一测 →</view>
+      <view class="ob-actions">
+        <view class="ob-btn ob-btn--ghost" bindtap="onSkipMbtiGuide">跳过</view>
+        <view class="ob-btn ob-btn--primary" bindtap="onSaveMbtiFromGuide">保存</view>
+      </view>
+    </block>
+    <block wx:elif="{{mbtiGuideMode === 'test'}}">
+      <text class="ob-title">🧠 发现你的人格类型</text>
+      <text class="ob-subtitle">做一个简短的测试，结果将永久保存到你的档案</text>
+      <view class="ob-test-illus">
+        <text class="ob-test-illus__icon">🎨</text>
+        <text class="ob-test-illus__text">测试只需 3 分钟，完成后自动记录结果</text>
+      </view>
+      <view class="ob-btn ob-btn--primary" style="margin-bottom:20rpx;" bindtap="onGoMbtiTestFromGuide">开始测试</view>
+      <view class="ob-back" bindtap="onSwitchMbtiSelect">← 我知道我的 MBTI，直接选</view>
+      <view class="ob-btn ob-btn--ghost" style="margin-top:24rpx;" bindtap="onSkipMbtiGuide">跳过</view>
+    </block>
+  </view>
+</view>
+
 <view class="my">
   <view class="profile-bg">
     <image

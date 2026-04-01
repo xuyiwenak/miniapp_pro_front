@@ -1,4 +1,22 @@
 <t-navbar title="上传作品" left-arrow />
+
+<!-- 节点二：风格标签引导弹窗 -->
+<view class="ob-mask" wx:if="{{showTagGuide}}">
+  <view class="ob-card">
+    <text class="ob-title">告诉大家这幅作品背后的你</text>
+    <text class="ob-subtitle">选几个标签（最多5个），让欣赏你作品的人更了解你</text>
+    <view class="ob-tags">
+      <view
+        wx:for="{{presetTags}}" wx:key="*this"
+        class="ob-tag {{selectedArtTags.indexOf(item) >= 0 ? 'ob-tag--active' : ''}}"
+        data-tag="{{item}}" bindtap="onTagTap">{{item}}</view>
+    </view>
+    <view class="ob-actions">
+      <view class="ob-btn ob-btn--ghost" bindtap="onSkipTags">跳过</view>
+      <view class="ob-btn ob-btn--primary" bindtap="onSaveTags">完成</view>
+    </view>
+  </view>
+</view>
 <view class="page">
   <view class="release-container">
     <view class="upload box">

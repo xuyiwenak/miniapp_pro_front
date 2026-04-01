@@ -1,6 +1,5 @@
 import request from '~/api/request';
 import { uploadImage } from '~/api/upload';
-import { areaList } from './areaData.js';
 
 /** 根据生日 YYYY-MM-DD 计算星座（阳历），仅前端展示用 */
 function getStarFromBirth(birth) {
@@ -47,7 +46,6 @@ Page({
       name: '',
       gender: 0,
       birth: '',
-      address: [],
       introduction: '',
       photos: [],
       image: '',
@@ -68,14 +66,9 @@ Page({
       },
     ],
     birthVisible: false,
-    birthStart: '1970-01-01',
-    birthEnd: '2025-03-01',
-    birthTime: 0,
+    birthStart: '1920-01-01',
+    birthEnd: '2015-12-31',
     birthFilter: (type, options) => (type === 'year' ? options.sort((a, b) => b.value - a.value) : options),
-    addressText: '',
-    addressVisible: false,
-    provinces: [],
-    cities: [],
 
     gridConfig: {
       column: 3,
@@ -85,7 +78,6 @@ Page({
   },
 
   onLoad() {
-    this.initAreaData();
     this.getPersonalInfo();
   },
 
@@ -101,23 +93,12 @@ Page({
           name: raw.name || '',
           gender: raw.gender ?? 0,
           birth,
-          address: Array.isArray(raw.address) ? raw.address : [],
           introduction: raw.brief || '',
           photos: Array.isArray(raw.photos) ? raw.photos : [],
           image: raw.image || '',
           star,
         };
-        this.setData(
-          { personInfo },
-          () => {
-            const { personInfo: p } = this.data;
-            if (p.address && p.address[0] != null && p.address[1] != null) {
-              this.setData({
-                addressText: `${areaList.provinces[p.address[0]] || ''} ${areaList.cities[p.address[1]] || ''}`.trim(),
-              });
-            }
-          },
-        );
+        this.setData({ personInfo });
       })
       .catch(() => {
         this.setData({
@@ -125,7 +106,6 @@ Page({
             name: '',
             gender: 0,
             birth: '',
-            address: [],
             introduction: '',
             photos: [],
             image: '',
@@ -135,44 +115,9 @@ Page({
       });
   },
 
-  getAreaOptions(data, filter) {
-    const res = Object.keys(data).map((key) => ({ value: key, label: data[key] }));
-    return typeof filter === 'function' ? res.filter(filter) : res;
-  },
-
-  getCities(provinceValue) {
-    return this.getAreaOptions(
-      areaList.cities,
-      (city) => `${city.value}`.slice(0, 2) === `${provinceValue}`.slice(0, 2),
-    );
-  },
-
-  initAreaData() {
-    const provinces = this.getAreaOptions(areaList.provinces);
-    const cities = this.getCities(provinces[0].value);
-    this.setData({ provinces, cities });
-  },
-
-  onAreaPick(e) {
-    const { column, index } = e.detail;
-    const { provinces } = this.data;
-
-    // 更改省份则更新城市列表
-    if (column === 0) {
-      const cities = this.getCities(provinces[index].value);
-      this.setData({ cities });
-    }
-  },
-
   showPicker(e) {
     const { mode } = e.currentTarget.dataset;
-    this.setData({
-      [`${mode}Visible`]: true,
-    });
-    if (mode === 'address') {
-      const cities = this.getCities(this.data.personInfo.address[0]);
-      this.setData({ cities });
-    }
+    this.setData({ [`${mode}Visible`]: true });
   },
 
   hidePicker(e) {
@@ -192,11 +137,6 @@ Page({
     if (mode === 'birth') {
       const star = getStarFromBirth(value);
       this.setData({ 'personInfo.star': star });
-    }
-    if (mode === 'address') {
-      this.setData({
-        addressText: label.join(' '),
-      });
     }
   },
 
@@ -278,7 +218,6 @@ Page({
       name: personInfo.name || '',
       gender: personInfo.gender ?? 0,
       birth: personInfo.birth || '',
-      address: personInfo.address || [],
       brief: personInfo.introduction || '',
       photos: personInfo.photos || [],
       image: personInfo.image || undefined,

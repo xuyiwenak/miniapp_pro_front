@@ -1,0 +1,142 @@
+<nav title-text="上传作品" />
+
+<!-- 昵称引导弹窗（节点一，首次登录触发） -->
+<view class="ob-mask ob-mask--center" wx:if="{{showNicknameGuide}}">
+  <view class="ob-dialog" catchtap="">
+    <text class="ob-title">给自己起个昵称吧</text>
+    <text class="ob-subtitle">这将是你在工坊的身份</text>
+    <input class="ob-input" placeholder="输入你的昵称" value="{{draftNickname}}"
+      bindinput="onNicknameInput" maxlength="20" adjust-position="{{false}}" />
+
+    <view class="ob-birth-row" bindtap="onShowBirthPicker">
+      <text class="ob-birth-label">🎂 生日</text>
+      <text class="ob-birth-val {{draftBirth ? '' : 'ob-birth-val--placeholder'}}">
+        {{draftBirth || '选择生日（选填）'}}
+      </text>
+      <text wx:if="{{draftStar}}" class="ob-birth-star">{{draftStar}}</text>
+    </view>
+    <text class="ob-birth-hint">填写生日后，AI 可以结合星座解读作品</text>
+
+    <view class="ob-actions">
+      <view class="ob-btn ob-btn--ghost" bindtap="onSkipNickname">跳过</view>
+      <view class="ob-btn ob-btn--primary" bindtap="onSaveNickname">完成</view>
+    </view>
+  </view>
+</view>
+
+<t-date-time-picker
+  auto-close
+  mode="date"
+  format="YYYY-MM-DD"
+  title="选择生日"
+  start="1920-01-01"
+  end="2015-12-31"
+  value="{{draftBirth}}"
+  defaultValue="{{draftBirth}}"
+  visible="{{birthPickerVisible}}"
+  popup-props="{{ { usingCustomNavbar: true } }}"
+  cancelBtn="取消"
+  confirmBtn="确认"
+  bind:change="onBirthPickerChange"
+  bind:cancel="onHideBirthPicker"
+/>
+
+<!-- 隐私声明详情弹窗 -->
+<view class="privacy-mask" wx:if="{{showPrivacyDetail}}" bindtap="onHidePrivacyDetail">
+  <view class="privacy-popup" catchtap="">
+    <text class="privacy-popup__title">隐私保护声明</text>
+    <scroll-view class="privacy-popup__body" scroll-y>
+      <text class="privacy-popup__text">
+一、信息收集与使用
+
+我们仅收集您在使用本平台服务时主动上传的作品图片、昵称、生日等信息，用于提供心灵疗愈分析服务。
+
+二、作品使用承诺
+
+您上传的所有作品仅用于本平台的 AI 心灵疗愈分析功能。我们承诺：
+
+• 不会将您的作品用于任何形式的商业用途
+• 不会在未经您授权的情况下公开展示您的作品
+• 不会将您的作品出售、转让或授权给第三方
+• 不会将您的作品用于模型训练或其他 AI 商业服务
+
+三、数据安全
+
+我们采用行业标准的加密技术保护您的数据，并限制内部访问权限，确保您的信息安全。
+
+四、您的权利
+
+您有权随时申请删除您上传的作品及个人信息。如需删除，请通过平台内反馈功能联系我们。
+
+五、声明更新
+
+如本声明有重大变更，我们将在平台内提前通知您。继续使用即视为同意更新后的声明。
+      </text>
+    </scroll-view>
+    <view class="privacy-popup__close" bindtap="onHidePrivacyDetail">我知道了</view>
+  </view>
+</view>
+
+<!-- 主内容 -->
+<scroll-view class="upload-scroll" scroll-y>
+  <!-- 问候语 -->
+  <view class="upload-greeting" wx:if="{{userName}}">
+    <text class="upload-greeting__hi">Hi {{userName}}，你好 👋</text>
+    <text class="upload-greeting__sub">欢迎来到心灵艺术工坊</text>
+  </view>
+
+  <!-- 每日上传限制提示 -->
+  <view class="upload-notice">
+    <view class="upload-notice__row">
+      <text class="upload-notice__icon">📅</text>
+      <view class="upload-notice__content">
+        <text class="upload-notice__title">每日上传限制</text>
+        <text class="upload-notice__desc">每日最多上传 {{dailyLimit}} 件作品，次日 0:00 自动重置</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 上传规范 -->
+  <view class="upload-rules">
+    <text class="upload-rules__title">上传规范</text>
+    <view class="upload-rules__item">
+      <text class="upload-rules__dot">·</text>
+      <text class="upload-rules__text">作品须为本人原创内容，不得侵犯他人版权</text>
+    </view>
+    <view class="upload-rules__item">
+      <text class="upload-rules__dot">·</text>
+      <text class="upload-rules__text">内容需健康积极，不含违法违规或敏感信息</text>
+    </view>
+    <view class="upload-rules__item">
+      <text class="upload-rules__dot">·</text>
+      <text class="upload-rules__text">建议图片清晰度不低于 720px，支持 JPG / PNG</text>
+    </view>
+    <view class="upload-rules__item">
+      <text class="upload-rules__dot">·</text>
+      <text class="upload-rules__text">每次仅可上传 1 张图片，可附带描述文字</text>
+    </view>
+  </view>
+
+  <!-- 商业用途承诺 -->
+  <view class="upload-pledge">
+    <text class="upload-pledge__icon">🔒</text>
+    <text class="upload-pledge__text">我们承诺：您上传的作品仅用于本平台心灵疗愈分析，不会用于任何商业用途，更不会在未经授权的情况下对外展示或转让。</text>
+  </view>
+
+  <!-- 隐私协议勾选 -->
+  <view class="upload-privacy">
+    <view class="upload-privacy__checkbox {{privacyAgreed ? 'upload-privacy__checkbox--checked' : ''}}" bindtap="onTogglePrivacy">
+      <text wx:if="{{privacyAgreed}}" class="upload-privacy__check">✓</text>
+    </view>
+    <text class="upload-privacy__text">我已阅读并同意</text>
+    <text class="upload-privacy__link" bindtap="onShowPrivacyDetail">《隐私保护声明》</text>
+  </view>
+
+  <!-- 上传按钮 -->
+  <view class="upload-btn {{privacyAgreed ? '' : 'upload-btn--disabled'}}" bindtap="onUploadTap">
+    <text class="upload-btn__icon">＋</text>
+    <text class="upload-btn__text">上传作品</text>
+  </view>
+
+  <view style="height: 40rpx;" />
+</scroll-view>

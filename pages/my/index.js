@@ -2,6 +2,7 @@ import request from '~/api/request';
 import { uploadImage } from '~/api/upload';
 import useToastBehavior from '~/behaviors/useToast';
 import { MBTI_META } from '~/utils/mbtiConfig';
+import { updateOnboarding } from '~/api/onboarding';
 
 const STAR_EMOJI_MAP = {
   白羊座: '♈', 金牛座: '♉', 双子座: '♊', 巨蟹座: '♋',
@@ -21,6 +22,10 @@ Page({
     activeTab: 0,
     workList: [],
     worksLoading: false,
+    showMbtiGuide: false,
+    mbtiGuideMode: 'select',
+    draftMbti: '',
+    mbtiOptions: ['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP'],
   },
 
   async onShow() {
@@ -35,6 +40,11 @@ Page({
       this.fetchWorks(TAB_MODES[this.data.activeTab]);
     } catch {
       this.setData({ isLoad: false, personalInfo: {} });
+    }
+    // 检查是否需要展示 MBTI 引导（昵称引导完成后跳转触发）
+    if (wx.getStorageSync('show_mbti_guide_on_my')) {
+      wx.removeStorageSync('show_mbti_guide_on_my');
+      this.setData({ showMbtiGuide: true, mbtiGuideMode: 'select', draftMbti: '' });
     }
   },
 
@@ -92,6 +102,38 @@ Page({
 
   onNavigateTo() {
     wx.navigateTo({ url: '/pages/my/info-edit/index' });
+  },
+
+  onMbtiGuideSelect(e) {
+    this.setData({ draftMbti: e.currentTarget.dataset.mbti });
+  },
+  onSwitchMbtiTest() {
+    this.setData({ mbtiGuideMode: 'test' });
+  },
+  onSwitchMbtiSelect() {
+    this.setData({ mbtiGuideMode: 'select' });
+  },
+  async onSaveMbtiFromGuide() {
+    const mbti = this.data.draftMbti;
+    if (!mbti) {
+      wx.showToast({ title: '请先选择你的 MBTI', icon: 'none' });
+      return;
+    }
+    try {
+      await updateOnboarding({ mbti, onboardingStep: 3 });
+      wx.setStorageSync('ob_step', 3);
+      wx.showToast({ title: '已保存到档案', icon: 'success' });
+    } catch {}
+    this.setData({ showMbtiGuide: false });
+    // 刷新页面信息以展示新 MBTI
+    this.getPersonalInfo().then((personalInfo) => this.setData({ personalInfo })).catch(() => {});
+  },
+  onSkipMbtiGuide() {
+    this.setData({ showMbtiGuide: false });
+  },
+  onGoMbtiTestFromGuide() {
+    this.setData({ showMbtiGuide: false });
+    wx.navigateTo({ url: '/pages/mbti/index' });
   },
 
   onMbtiTap() {

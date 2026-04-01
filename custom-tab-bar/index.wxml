@@ -1,13 +1,12 @@
 <view class="tab-bar">
-  <view class="tab-bar__item {{value === 'home' ? 'tab-bar__item--active' : ''}}" bindtap="handleChange" data-value="home">
-    <t-icon name="home" size="48rpx" />
-    <text class="tab-bar__label">首页</text>
+  <view class="tab-bar__item {{value === 'upload' ? 'tab-bar__item--active' : ''}}" bindtap="handleChange" data-value="upload">
+    <t-icon name="upload" size="48rpx" />
+    <text class="tab-bar__label">上传作品</text>
   </view>
 
-  <view class="tab-bar__publish" bindtap="goRelease">
-    <view class="tab-bar__publish-btn">
-      <t-icon name="add" size="48rpx" color="#fff" />
-    </view>
+  <view class="tab-bar__item {{value === 'home' ? 'tab-bar__item--active' : ''}}" bindtap="handleChange" data-value="home">
+    <t-icon name="home" size="48rpx" />
+    <text class="tab-bar__label">作品范例</text>
   </view>
 
   <view class="tab-bar__item {{value === 'my' ? 'tab-bar__item--active' : ''}}" bindtap="handleChange" data-value="my">

@@ -1,6 +1,7 @@
 {
   "lazyCodeLoading": "requiredComponents",
   "pages": [
+    "pages/upload/index",
     "pages/home/index",
     "pages/my/index"
   ],
@@ -74,8 +75,12 @@
     "custom": true,
     "list": [
       {
+        "pagePath": "pages/upload/index",
+        "text": "上传作品"
+      },
+      {
         "pagePath": "pages/home/index",
-        "text": "首页"
+        "text": "作品范例"
       },
       {
         "pagePath": "pages/my/index",

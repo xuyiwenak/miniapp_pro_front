@@ -1,31 +1,25 @@
 import Message from 'tdesign-miniprogram/message/index';
 import request from '~/api/request';
 
-// 获取应用实例
-// const app = getApp()
-
 Page({
   data: {
     refreshing: false,
     cardInfo: [],
   },
-  // 生命周期
   async onReady() {
     const cardRes = await request('/home/cards').then((res) => res.data);
     const cards = Array.isArray(cardRes) ? cardRes : cardRes?.data || [];
     this.setData({ cardInfo: cards });
   },
-  onLoad(option) {
+  async onLoad(option) {
     if (option.oper) {
       let content = '';
-      if (option.oper === 'release') {
-        content = '上传成功';
-      } else if (option.oper === 'save') {
-        content = '保存成功';
-      }
+      if (option.oper === 'release') content = '上传成功';
+      else if (option.oper === 'save') content = '保存成功';
       this.showOperMsg(content);
     }
   },
+  async onShow() {},
   async onPullDownRefresh() {
     this.setData({ refreshing: true });
     try {
@@ -45,12 +39,7 @@ Page({
       content,
     });
   },
-  goRelease() {
-    wx.navigateTo({
-      url: '/pages/release/index',
-    });
-  },
-  onCardTap(e) {
+onCardTap(e) {
     const workId = e.currentTarget.dataset.workId;
     if (!workId) return;
     wx.navigateTo({

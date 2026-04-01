@@ -1,3 +1,38 @@
+<!-- 节点三：MBTI 引导弹窗 -->
+<view class="ob-mask" wx:if="{{showMbtiGuide}}">
+  <view class="ob-card">
+    <!-- 子状态 A：我知道我的 MBTI -->
+    <block wx:if="{{!mbtiGuideMode || mbtiGuideMode === 'select'}}">
+      <text class="ob-title">✨ 加入你的 MBTI</text>
+      <text class="ob-subtitle">AI 将从人格视角解读作品与你内心的联结</text>
+      <view class="ob-tags">
+        <view
+          wx:for="{{mbtiOptions}}" wx:key="*this"
+          class="ob-tag {{draftMbti === item ? 'ob-tag--active' : ''}}"
+          data-mbti="{{item}}" bindtap="onMbtiSelect">{{item}}</view>
+      </view>
+      <view class="ob-hint" bindtap="onSwitchMbtiTest">不知道自己的 MBTI？去测一测 →</view>
+      <view class="ob-actions">
+        <view class="ob-btn ob-btn--ghost" bindtap="onSkipMbti">跳过</view>
+        <view class="ob-btn ob-btn--primary" bindtap="onSaveMbti">确认并分析</view>
+      </view>
+    </block>
+
+    <!-- 子状态 B：引导去测试 -->
+    <block wx:elif="{{mbtiGuideMode === 'test'}}">
+      <text class="ob-title">🧠 发现你的人格类型</text>
+      <text class="ob-subtitle">做一个简短的测试，AI 分析会更懂你</text>
+      <view class="ob-test-illus">
+        <text class="ob-test-illus__icon">🎨</text>
+        <text class="ob-test-illus__text">测试只需 3 分钟，结果将永久保存到你的档案</text>
+      </view>
+      <view class="ob-btn ob-btn--primary" style="margin-bottom:20rpx;" bindtap="onGoMbtiTest">开始测试</view>
+      <view class="ob-back" bindtap="onSwitchMbtiSelect">← 我知道我的 MBTI，直接选</view>
+      <view class="ob-btn ob-btn--ghost" style="margin-top:24rpx;" bindtap="onSkipMbti">跳过</view>
+    </block>
+  </view>
+</view>
+
 <view class="work-detail" wx:if="{{!loading && !error && work}}">
   <view class="work-detail__media">
     <block wx:if="{{work.images && work.images.length > 0}}">

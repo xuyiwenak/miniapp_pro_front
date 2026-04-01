@@ -1,5 +1,6 @@
 import request from '~/api/request';
 import config from '~/config';
+import { getOnboardingStatus, updateOnboarding } from '~/api/onboarding';
 
 /** pending 时轮询 /healing/status：首包稍快，之后拉长间隔，减轻服务端压力（Coze 常需数分钟） */
 const HEALING_POLL_FIRST_MS = 6000;
@@ -21,6 +22,10 @@ Page({
     healingLoading: false,
     healingError: '',
     healingAnalyzed: false,
+    showMbtiGuide: false,
+    mbtiGuideMode: 'select', // 'select' | 'test'
+    mbtiOptions: ['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP'],
+    draftMbti: '',
     healingVisible: false,
     healingStatus: 'none', // none | pending | success
     healingIsPublic: false,
@@ -251,6 +256,24 @@ Page({
     const { workId, healingLoading } = this.data;
     if (!workId || healingLoading) return;
 
+    // 节点三：首次分析前检查 MBTI
+    try {
+      const info = await getOnboardingStatus();
+      if (info.forceReset) wx.setStorageSync('ob_step', 0);
+      const obStep = wx.getStorageSync('ob_step') ?? 0;
+      if (obStep < 3 && (info.onboardingStep ?? 0) < 3 && !info.mbti) {
+        this.setData({ showMbtiGuide: true, mbtiGuideMode: 'select' });
+        return;
+      }
+      if (obStep < 3) wx.setStorageSync('ob_step', 3);
+    } catch {}
+
+    this._doAnalyze();
+  },
+  async _doAnalyze() {
+    const { workId, healingLoading } = this.data;
+    if (!workId || healingLoading) return;
+
     this.setData({
       healingLoading: true,
       healingError: '',
@@ -273,6 +296,37 @@ Page({
         healingError: message,
       });
     }
+  },
+
+  onMbtiSelect(e) {
+    this.setData({ draftMbti: e.currentTarget.dataset.mbti });
+  },
+  onSwitchMbtiTest() {
+    this.setData({ mbtiGuideMode: 'test' });
+  },
+  onSwitchMbtiSelect() {
+    this.setData({ mbtiGuideMode: 'select' });
+  },
+  async onSaveMbti() {
+    const mbti = this.data.draftMbti;
+    try {
+      await updateOnboarding({ mbti, onboardingStep: 3 });
+      wx.setStorageSync('ob_step', 3);
+    } catch {}
+    this.setData({ showMbtiGuide: false });
+    this._doAnalyze();
+  },
+  onSkipMbti() {
+    updateOnboarding({ onboardingStep: 3 }).catch(() => {});
+    wx.setStorageSync('ob_step', 3);
+    this.setData({ showMbtiGuide: false });
+    this._doAnalyze();
+  },
+  onGoMbtiTest() {
+    updateOnboarding({ onboardingStep: 3 }).catch(() => {});
+    wx.setStorageSync('ob_step', 3);
+    this.setData({ showMbtiGuide: false });
+    wx.navigateTo({ url: '/pages/mbti/index' });
   },
 
   _pollStatus(workId) {

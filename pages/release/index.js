@@ -2,6 +2,7 @@
 import request from '~/api/request';
 import { uploadImage } from '~/api/upload';
 import config from '~/config';
+import { getOnboardingStatus, updateOnboarding } from '~/api/onboarding';
 
 function toPreviewUrl(url) {
   if (!url) return url;
@@ -16,6 +17,9 @@ Page({
    */
   data: {
     originFiles: [],
+    showTagGuide: false,
+    presetTags: [],
+    selectedArtTags: [],
     gridConfig: {
       column: 1,
       width: 160,
@@ -166,9 +170,7 @@ Page({
       wx.hideLoading();
       if (res && (res.success || res.data)) {
         wx.showToast({ title: '发布成功', icon: 'success', duration: 1500 });
-        setTimeout(() => {
-          wx.reLaunch({ url: '/pages/work-list/index' });
-        }, 1500);
+        setTimeout(() => this._afterPublish(), 1500);
       } else {
         wx.showToast({ title: '发布失败', icon: 'none' });
       }
@@ -178,5 +180,39 @@ Page({
       const msg = code === 401 ? '请先登录' : ((err && err.message) || (err && err.data && err.data.message) || '发布失败');
       wx.showToast({ title: msg, icon: 'none' });
     }
+  },
+  async _afterPublish() {
+    try {
+      const info = await getOnboardingStatus();
+      if (info.forceReset) wx.setStorageSync('ob_step', 0);
+      const obStep = wx.getStorageSync('ob_step') ?? 0;
+      if (obStep < 2 && (info.onboardingStep ?? 0) < 2) {
+        this.setData({ showTagGuide: true, presetTags: info.presetTags || [] });
+        return;
+      }
+    } catch {}
+    wx.reLaunch({ url: '/pages/work-list/index' });
+  },
+  onTagTap(e) {
+    const tag = e.currentTarget.dataset.tag;
+    const cur = [...this.data.selectedArtTags];
+    const idx = cur.indexOf(tag);
+    if (idx >= 0) cur.splice(idx, 1);
+    else if (cur.length < 5) cur.push(tag);
+    this.setData({ selectedArtTags: cur });
+  },
+  async onSaveTags() {
+    try {
+      await updateOnboarding({ artTags: this.data.selectedArtTags, onboardingStep: 2 });
+      wx.setStorageSync('ob_step', 2);
+    } catch {}
+    this.setData({ showTagGuide: false });
+    wx.reLaunch({ url: '/pages/work-list/index' });
+  },
+  onSkipTags() {
+    updateOnboarding({ onboardingStep: 2 }).catch(() => {});
+    wx.setStorageSync('ob_step', 2);
+    this.setData({ showTagGuide: false });
+    wx.reLaunch({ url: '/pages/work-list/index' });
   },
 });

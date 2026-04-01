@@ -30,14 +30,6 @@
     data-mode="birth"
   />
 
-  <t-cell
-    title="地址"
-    note="{{addressText || ''}}"
-    arrow
-    bind:click="showPicker"
-    data-mode="address"
-  />
-
   <t-cell class="info-edit__cell" title="个人简介">
     <t-textarea
       slot="note"
@@ -98,19 +90,3 @@
   bind:cancel="hidePicker"
 />
 
-<t-picker
-  mode="address"
-  title="选择地址"
-  value="{{personInfo.address}}"
-  visible="{{addressVisible}}"
-  data-mode="address"
-  cancelBtn="取消"
-  confirmBtn="确认"
-  bind:pick="onAreaPick"
-  bind:change="onPickerChange"
-  bind:cancel="hidePicker"
-  bind:close="hidePicker"
->
-  <t-picker-item options="{{provinces}}" />
-  <t-picker-item options="{{cities}}" />
-</t-picker>

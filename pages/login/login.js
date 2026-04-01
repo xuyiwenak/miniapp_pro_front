@@ -71,7 +71,7 @@ Page({
         await wx.setStorageSync('access_token', res.data.token);
         wx.removeStorageSync('temp_token');
         wx.switchTab({
-          url: '/pages/home/index',
+          url: '/pages/upload/index',
         });
         return;
       }
@@ -104,7 +104,7 @@ Page({
       if (res.success) {
         await wx.setStorageSync('access_token', res.data.token);
         wx.switchTab({
-          url: '/pages/home/index',
+          url: '/pages/upload/index',
         });
       }
     } catch (err) {
@@ -118,7 +118,7 @@ Page({
       if (res.success) {
         await wx.setStorageSync('access_token', res.data.token);
         wx.switchTab({
-          url: `/pages/home/index`,
+          url: `/pages/upload/index`,
         });
       }
     }

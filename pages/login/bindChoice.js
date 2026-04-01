@@ -47,7 +47,7 @@ Page({
       if (res?.success && res?.data?.token) {
         await wx.setStorageSync('access_token', res.data.token);
         wx.removeStorageSync('temp_token');
-        wx.switchTab({ url: '/pages/home/index' });
+        wx.switchTab({ url: '/pages/upload/index' });
         return;
       }
       wx.showToast({ title: res?.message || '创建账号失败', icon: 'none' });
@@ -78,7 +78,7 @@ Page({
       if (res?.success && res?.data?.token) {
         await wx.setStorageSync('access_token', res.data.token);
         wx.removeStorageSync('temp_token');
-        wx.switchTab({ url: '/pages/home/index' });
+        wx.switchTab({ url: '/pages/upload/index' });
         return;
       }
       wx.showToast({ title: res?.message || '绑定失败', icon: 'none' });

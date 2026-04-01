@@ -1,4 +1,19 @@
 <nav title-text="范例展示" />
+
+<!-- 节点一：起艺名引导弹窗 -->
+<view class="ob-mask" wx:if="{{showNicknameGuide}}" bindtap="onSkipNickname">
+  <view class="ob-card" catchtap="" style="height: 902rpx; display: block; box-sizing: border-box">
+    <text class="ob-title">给自己起个昵称吧</text>
+    <text class="ob-subtitle">这将是你的身份</text>
+    <input style="height: 35rpx; display: block; box-sizing: border-box" class="ob-input" placeholder="输入你的昵称" value="{{draftNickname}}"
+      bindinput="onNicknameInput" maxlength="20" />
+    <view class="ob-actions">
+      <view class="ob-btn ob-btn--ghost" bindtap="onSkipNickname">跳过</view>
+      <view class="ob-btn ob-btn--primary" bindtap="onSaveNickname">完成</view>
+    </view>
+  </view>
+</view>
+
 <view class="home-container">
   <scroll-view
     class="home-scroll"
