@@ -13,8 +13,9 @@
  *  给页面渲染留出时间，避免接口与渲染竞争。 */
 export const HEALING_AUTO_TRIGGER_DELAY_MS = 400;
 
-/** 疗愈分析预估完成时长（秒）。用于进度条满跑时间。
- *  Coze 工作流通常需要数分钟，设为 10 分钟留足余量。 */
+/** 疗愈分析预估完成时长（秒）。仅作离线 fallback。
+ *  运行时以后端 /healing/status 返回的 estimatedSeconds 为准。
+ *  ⚠️ 修改时需同步修改 art_backend/src/miniapp/routes/healing.ts 的 HEALING_ESTIMATED_SECONDS。 */
 export const HEALING_ESTIMATED_SECONDS = 600;
 
 /** 进度条最高只推进到此百分比，最后一格留给真实完成事件。 */

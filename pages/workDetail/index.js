@@ -39,6 +39,7 @@ Page({
     healingIsPublic: false,
     healingScores: null,
     healingScoreDimensions: [],
+    healingSubmittedAt: null,
     healingSummary: '',
     healingColorAnalysis: '',
     healingDominantEmotion: '',
@@ -125,6 +126,7 @@ Page({
       healingIsPublic: !!work.healingIsPublic,
       healingScores: work.healingScores || null,
       healingScoreDimensions: work.healingScoreDimensions || [],
+      healingSubmittedAt: work.healingSubmittedAt || null,
       healingSummary: work.healingSummary || '',
       healingColorAnalysis: work.healingColorAnalysis || '',
       healingDominantEmotion: work.healingDominantEmotion || '',
@@ -139,8 +141,9 @@ Page({
 
     if (healingStatus === 'pending') {
       this.setData({ healingLoading: true });
-      // Don't start timer with null here — wait for the first poll to return
-      // the real submittedAt so progress is always calculated from the correct origin
+      // 用后端返回的 submittedAt 作为起点，保证倒计时从一开始就准确
+      // 没有 submittedAt 时 fallback 到当前时间（仅首次触发分析可能出现）
+      this._startProgressTimer(work.healingSubmittedAt || null, HEALING_ESTIMATED_SECONDS);
       this._startHealingPush();
       this._pollStatus(this.data.workId);
     }
