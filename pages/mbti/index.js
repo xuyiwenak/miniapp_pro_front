@@ -1,6 +1,7 @@
 import request from '~/api/request';
 import { MBTI_QUESTIONS, MBTI_OPTIONS } from './questions';
 import { getMbtiStyle } from '~/utils/mbtiConfig';
+import { MBTI_QUESTION_ADVANCE_DELAY_MS, MBTI_SAVE_NAV_BACK_DELAY_MS } from '~/config/constants';
 
 function calcMBTIWithDetail(answers) {
   const scores = { EI: 0, NS: 0, TF: 0, JP: 0 };
@@ -119,7 +120,7 @@ Page({
             this.setData({ currentIndex: this.data.currentIndex + 1 }, () => {
               this.updateProgress();
             });
-          }, 250);
+          }, MBTI_QUESTION_ADVANCE_DELAY_MS);
         }
       },
     );
@@ -195,7 +196,7 @@ Page({
       wx.showToast({ title: '已更新到我的人格', icon: 'success' });
       setTimeout(() => {
         wx.navigateBack();
-      }, 600);
+      }, MBTI_SAVE_NAV_BACK_DELAY_MS);
     } catch (err) {
       wx.hideLoading();
       wx.showToast({ title: '更新失败，请稍后重试', icon: 'none' });

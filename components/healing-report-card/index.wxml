@@ -1,7 +1,6 @@
 <view class="healing-card" wx:if="{{visible}}">
   <view class="healing-card__header">
     <view class="healing-card__title">
-      <t-icon name="chart-radar" size="40rpx" />
       <text class="healing-card__title-text">分析结果</text>
     </view>
     <view class="healing-card__privacy" wx:if="{{canTogglePrivacy}}">
@@ -10,7 +9,7 @@
     </view>
   </view>
 
-  <view class="healing-card__radar">
+  <view class="healing-card__radar" wx:if="{{scores && scoreDimensions.length >= 3}}">
     <canvas
       canvas-id="radarCanvas"
       class="healing-card__canvas"

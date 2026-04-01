@@ -1,11 +1,17 @@
 import request from '~/api/request';
 import config from '~/config';
 import { getOnboardingStatus, updateOnboarding } from '~/api/onboarding';
-
-/** pending 时轮询 /healing/status：首包稍快，之后拉长间隔，减轻服务端压力（Coze 常需数分钟） */
-const HEALING_POLL_FIRST_MS = 6000;
-const HEALING_POLL_MIN_INTERVAL_MS = 12000;
-const HEALING_POLL_MAX_INTERVAL_MS = 45000;
+import {
+  HEALING_AUTO_TRIGGER_DELAY_MS,
+  HEALING_ESTIMATED_SECONDS,
+  HEALING_PROGRESS_CAP_PCT,
+  HEALING_POLL_FIRST_MS,
+  HEALING_POLL_MIN_INTERVAL_MS,
+  HEALING_POLL_MAX_INTERVAL_MS,
+  HEALING_POLL_BACKOFF_PENDING,
+  HEALING_POLL_BACKOFF_ERROR,
+  HEALING_PROGRESS_TICK_MS,
+} from '~/config/constants';
 
 function apiBaseToWsUrl(apiBase) {
   if (!apiBase) return '';
@@ -28,8 +34,11 @@ Page({
     draftMbti: '',
     healingVisible: false,
     healingStatus: 'none', // none | pending | success
+    healingProgress: 0,
+    healingRemainingSeconds: 0,
     healingIsPublic: false,
     healingScores: null,
+    healingScoreDimensions: [],
     healingSummary: '',
     healingColorAnalysis: '',
     healingDominantEmotion: '',
@@ -55,15 +64,16 @@ Page({
   onLoad(options) {
     const workId = (options && options.workId) || '';
     const source = (options && options.source) || '';
+    const autoAnalyze = !!(options && options.autoAnalyze);
     if (!workId) {
       this.setData({ loading: false, error: '缺少作品 ID' });
       return;
     }
     this.setData({ workId, source });
-    this.loadWork(workId, source);
+    this.loadWork(workId, source, autoAnalyze);
   },
 
-  async loadWork(workId, source) {
+  async loadWork(workId, source, autoAnalyze) {
     try {
       const api = source === 'my' ? '/work/detail' : '/home/workDetail';
       const res = await request(api, 'GET', { workId });
@@ -73,14 +83,14 @@ Page({
         createdAtDisplay: this.formatDate(body.createdAt),
       };
       this.setData({ work: enhancedWork, loading: false, error: '' });
-      this.applyHealingFromWork(body);
+      this.applyHealingFromWork(body, autoAnalyze);
     } catch (err) {
       const message = (err && err.message) || '加载失败';
       this.setData({ loading: false, error: message });
     }
   },
 
-  applyHealingFromWork(work) {
+  applyHealingFromWork(work, autoAnalyze) {
     if (!work || !work.healingAnalyzed) {
       this.setData({
         healingAnalyzed: false,
@@ -89,6 +99,9 @@ Page({
         healingScores: null,
         isOwner: !!work?.isOwner || this.data.source === 'my',
       });
+      if (autoAnalyze) {
+        setTimeout(() => this.onAnalyzeTap(), HEALING_AUTO_TRIGGER_DELAY_MS);
+      }
       return;
     }
 
@@ -111,6 +124,7 @@ Page({
       healingStatus,
       healingIsPublic: !!work.healingIsPublic,
       healingScores: work.healingScores || null,
+      healingScoreDimensions: work.healingScoreDimensions || [],
       healingSummary: work.healingSummary || '',
       healingColorAnalysis: work.healingColorAnalysis || '',
       healingDominantEmotion: work.healingDominantEmotion || '',
@@ -125,6 +139,8 @@ Page({
 
     if (healingStatus === 'pending') {
       this.setData({ healingLoading: true });
+      // Don't start timer with null here — wait for the first poll to return
+      // the real submittedAt so progress is always calculated from the correct origin
       this._startHealingPush();
       this._pollStatus(this.data.workId);
     }
@@ -136,6 +152,33 @@ Page({
       this._pollTimer = null;
     }
     this._stopHealingPush();
+    this._stopProgressTimer();
+  },
+
+  _startProgressTimer(submittedAt, estimatedSeconds) {
+    this._stopProgressTimer();
+    const est = estimatedSeconds || HEALING_ESTIMATED_SECONDS;
+    const startTs = submittedAt ? new Date(submittedAt).getTime() : Date.now();
+    const update = () => {
+      const elapsed = (Date.now() - startTs) / 1000;
+      const progress = Math.min(Math.round((elapsed / est) * 100), HEALING_PROGRESS_CAP_PCT);
+      const remaining = Math.max(Math.ceil(est - elapsed), 0);
+      const mins = Math.floor(remaining / 60);
+      const secs = remaining % 60;
+      const healingRemainingLabel = remaining > 0
+        ? `${mins}:${String(secs).padStart(2, '0')}`
+        : '';
+      this.setData({ healingProgress: progress, healingRemainingSeconds: remaining, healingRemainingLabel });
+    };
+    update();
+    this._progressTimer = setInterval(update, HEALING_PROGRESS_TICK_MS);
+  },
+
+  _stopProgressTimer() {
+    if (this._progressTimer) {
+      clearInterval(this._progressTimer);
+      this._progressTimer = null;
+    }
   },
 
   /** Coze 回调写库后服务端经 WS 推送，收到后立即拉 /healing/status */
@@ -231,12 +274,16 @@ Page({
     const status = body.status || body.data?.status;
     if (status !== 'success') return false;
     const data = body.data || body;
+    this._stopProgressTimer();
     this.setData({
+      healingProgress: 100,
+      healingRemainingSeconds: 0,
       healingLoading: false,
       healingAnalyzed: true,
       healingVisible: true,
       healingStatus: 'success',
       healingScores: data.scores || null,
+      healingScoreDimensions: data.scoreDimensions || [],
       healingSummary: data.summary || '',
       healingColorAnalysis: data.colorAnalysis || '',
       healingDominantEmotion: data.dominantEmotion || '',
@@ -284,6 +331,7 @@ Page({
 
     try {
       await request('/healing/analyze', 'POST', { data: { workId } });
+      this._startProgressTimer(null, HEALING_ESTIMATED_SECONDS);
       this._stopHealingPush();
       this._startHealingPush();
       this._pollStatus(workId);
@@ -346,6 +394,7 @@ Page({
         }
 
         if (status === 'failed') {
+          this._stopProgressTimer();
           this.setData({
             healingLoading: false,
             healingStatus: 'none',
@@ -356,15 +405,26 @@ Page({
           return;
         }
 
+        if (status === 'pending') {
+          const pendingData = body.data || body;
+          const submittedAt = pendingData.submittedAt;
+          const estimatedSeconds = pendingData.estimatedSeconds || 600;
+          if (submittedAt) {
+            // Always sync to server's actual submittedAt so progress is correct
+            // whether this is a fresh submit or the page was reopened mid-analysis
+            this._startProgressTimer(submittedAt, estimatedSeconds);
+          }
+        }
+
         const nextMs = Math.min(
-          Math.round(this._healingPollIntervalMs * 1.35),
+          Math.round(this._healingPollIntervalMs * HEALING_POLL_BACKOFF_PENDING),
           HEALING_POLL_MAX_INTERVAL_MS,
         );
         this._healingPollIntervalMs = nextMs;
         this._pollTimer = setTimeout(poll, nextMs);
       } catch {
         const nextMs = Math.min(
-          Math.round((this._healingPollIntervalMs || HEALING_POLL_MIN_INTERVAL_MS) * 1.2),
+          Math.round((this._healingPollIntervalMs || HEALING_POLL_MIN_INTERVAL_MS) * HEALING_POLL_BACKOFF_ERROR),
           HEALING_POLL_MAX_INTERVAL_MS,
         );
         this._healingPollIntervalMs = nextMs;

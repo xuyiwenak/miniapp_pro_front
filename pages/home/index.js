@@ -1,5 +1,6 @@
 import Message from 'tdesign-miniprogram/message/index';
 import request from '~/api/request';
+import { PULL_REFRESH_RESET_DELAY_MS } from '~/config/constants';
 
 Page({
   data: {
@@ -29,7 +30,7 @@ Page({
     } catch {
       wx.showToast({ title: '刷新失败', icon: 'none' });
     }
-    setTimeout(() => this.setData({ refreshing: false }), 600);
+    setTimeout(() => this.setData({ refreshing: false }), PULL_REFRESH_RESET_DELAY_MS);
   },
   showOperMsg(content) {
     Message.success({

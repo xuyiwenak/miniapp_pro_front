@@ -3,6 +3,7 @@ import request from '~/api/request';
 import { uploadImage } from '~/api/upload';
 import config from '~/config';
 import { getOnboardingStatus, updateOnboarding } from '~/api/onboarding';
+import { UPLOAD_IMAGE_COUNT, UPLOAD_PUBLISH_NAV_DELAY_MS, UPLOAD_MAX_TAGS } from '~/config/constants';
 
 function toPreviewUrl(url) {
   if (!url) return url;
@@ -20,13 +21,14 @@ Page({
     showTagGuide: false,
     presetTags: [],
     selectedArtTags: [],
+    publishedWorkId: '',
     gridConfig: {
-      column: 1,
+      column: UPLOAD_IMAGE_COUNT,
       width: 160,
       height: 160,
     },
     config: {
-      count: 1,
+      count: UPLOAD_IMAGE_COUNT,
     },
     tags: ['绘画', '版权素材', '原创', '风格灵动'],
     selectedTags: ['绘画'],
@@ -62,7 +64,7 @@ Page({
         showCancel: false,
         confirmText: '知道了',
       });
-      newlyAdded = newlyAdded.slice(0, 1);
+      newlyAdded = newlyAdded.slice(0, UPLOAD_IMAGE_COUNT);
     }
     wx.showLoading({ title: '上传中...' });
     try {
@@ -81,7 +83,7 @@ Page({
       );
       // 保留已存储的文件，再合并本次上传，总数截断为 1
       const others = (files || []).filter((f) => f.storedUrl);
-      this.setData({ originFiles: others.concat(uploaded).slice(0, 1) });
+      this.setData({ originFiles: others.concat(uploaded).slice(0, UPLOAD_IMAGE_COUNT) });
     } catch (err) {
       const msg = (err && err.code === 401) ? '请先登录' : '图片上传失败';
       wx.showToast({ title: msg, icon: 'none' });
@@ -169,8 +171,11 @@ Page({
       const res = await request('/work/publish', 'POST', { data: payload });
       wx.hideLoading();
       if (res && (res.success || res.data)) {
-        wx.showToast({ title: '发布成功', icon: 'success', duration: 1500 });
-        setTimeout(() => this._afterPublish(), 1500);
+        const body = res.data || res;
+        const workId = body.data?.workId || body.workId || '';
+        this.setData({ publishedWorkId: workId });
+        wx.showToast({ title: '发布成功', icon: 'success', duration: UPLOAD_PUBLISH_NAV_DELAY_MS });
+        setTimeout(() => this._afterPublish(), UPLOAD_PUBLISH_NAV_DELAY_MS);
       } else {
         wx.showToast({ title: '发布失败', icon: 'none' });
       }
@@ -191,14 +196,22 @@ Page({
         return;
       }
     } catch {}
-    wx.reLaunch({ url: '/pages/work-list/index' });
+    this._goToWorkDetail();
+  },
+  _goToWorkDetail() {
+    const workId = this.data.publishedWorkId;
+    if (workId) {
+      wx.redirectTo({ url: `/pages/workDetail/index?workId=${workId}&source=my&autoAnalyze=1` });
+    } else {
+      wx.reLaunch({ url: '/pages/work-list/index' });
+    }
   },
   onTagTap(e) {
     const tag = e.currentTarget.dataset.tag;
     const cur = [...this.data.selectedArtTags];
     const idx = cur.indexOf(tag);
     if (idx >= 0) cur.splice(idx, 1);
-    else if (cur.length < 5) cur.push(tag);
+    else if (cur.length < UPLOAD_MAX_TAGS) cur.push(tag);
     this.setData({ selectedArtTags: cur });
   },
   async onSaveTags() {
@@ -207,12 +220,12 @@ Page({
       wx.setStorageSync('ob_step', 2);
     } catch {}
     this.setData({ showTagGuide: false });
-    wx.reLaunch({ url: '/pages/work-list/index' });
+    this._goToWorkDetail();
   },
   onSkipTags() {
     updateOnboarding({ onboardingStep: 2 }).catch(() => {});
     wx.setStorageSync('ob_step', 2);
     this.setData({ showTagGuide: false });
-    wx.reLaunch({ url: '/pages/work-list/index' });
+    this._goToWorkDetail();
   },
 });

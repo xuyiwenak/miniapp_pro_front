@@ -1,9 +1,10 @@
 import request from '~/api/request';
+import { SMS_COUNTDOWN_SECONDS, SMS_COUNTDOWN_TICK_MS } from '~/config/constants';
 
 Page({
   data: {
     phoneNumber: '',
-    sendCodeCount: 60,
+    sendCodeCount: SMS_COUNTDOWN_SECONDS,
     verifyCode: '',
   },
 
@@ -24,7 +25,7 @@ Page({
   },
 
   countDown() {
-    this.setData({ sendCodeCount: 60 });
+    this.setData({ sendCodeCount: SMS_COUNTDOWN_SECONDS });
     this.timer = setInterval(() => {
       if (this.data.sendCodeCount <= 0) {
         this.setData({ isSend: false, sendCodeCount: 0 });
@@ -32,7 +33,7 @@ Page({
       } else {
         this.setData({ sendCodeCount: this.data.sendCodeCount - 1 });
       }
-    }, 1000);
+    }, SMS_COUNTDOWN_TICK_MS);
   },
 
   sendCode() {

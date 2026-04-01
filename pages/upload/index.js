@@ -1,7 +1,6 @@
 import request from '~/api/request';
 import { getOnboardingStatus, updateOnboarding } from '~/api/onboarding';
-
-const DAILY_LIMIT = 5;
+import { UPLOAD_DAILY_LIMIT } from '~/config/constants';
 
 function getStarFromBirth(birth) {
   if (!birth || typeof birth !== 'string') return '';
@@ -38,7 +37,7 @@ function getStarFromBirth(birth) {
 
 Page({
   data: {
-    dailyLimit: DAILY_LIMIT,
+    dailyLimit: UPLOAD_DAILY_LIMIT,
     userName: '',
     privacyAgreed: false,
     showPrivacyDetail: false,

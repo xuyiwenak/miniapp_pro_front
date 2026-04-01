@@ -1,5 +1,6 @@
 import request from '~/api/request';
 import useToastBehavior from '~/behaviors/useToast';
+import { FEEDBACK_TITLE_MAX_LEN, FEEDBACK_CONTENT_MAX_LEN } from '~/config/constants';
 
 Page({
   behaviors: [useToastBehavior],
@@ -22,12 +23,12 @@ Page({
 
   onTitleChange(e) {
     const { value } = e.detail;
-    this.setData({ title: value.slice(0, 30) });
+    this.setData({ title: value.slice(0, FEEDBACK_TITLE_MAX_LEN) });
   },
 
   onContentChange(e) {
     const { value } = e.detail;
-    this.setData({ content: value.slice(0, 300) });
+    this.setData({ content: value.slice(0, FEEDBACK_CONTENT_MAX_LEN) });
   },
 
   validateForm() {
@@ -40,12 +41,12 @@ Page({
       this.onShowToast('#t-toast', '请填写问题描述');
       return false;
     }
-    if (title.length > 30) {
-      this.onShowToast('#t-toast', '标题最多30个字');
+    if (title.length > FEEDBACK_TITLE_MAX_LEN) {
+      this.onShowToast('#t-toast', `标题最多${FEEDBACK_TITLE_MAX_LEN}个字`);
       return false;
     }
-    if (content.length > 300) {
-      this.onShowToast('#t-toast', '问题描述最多300个字');
+    if (content.length > FEEDBACK_CONTENT_MAX_LEN) {
+      this.onShowToast('#t-toast', `问题描述最多${FEEDBACK_CONTENT_MAX_LEN}个字`);
       return false;
     }
     return true;
