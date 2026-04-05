@@ -1,9 +1,6 @@
 <view class="healing-card" wx:if="{{visible}}">
-  <view class="healing-card__header">
-    <view class="healing-card__title">
-      <text class="healing-card__title-text">分析结果</text>
-    </view>
-    <view class="healing-card__privacy" wx:if="{{canTogglePrivacy}}">
+  <view class="healing-card__header" wx:if="{{canTogglePrivacy}}">
+    <view class="healing-card__privacy">
       <text class="healing-card__privacy-label">{{ isPublic ? '公域可见' : '仅自己可见' }}</text>
       <t-switch size="small" value="{{isPublic}}" bind:change="onPrivacyChange" />
     </view>

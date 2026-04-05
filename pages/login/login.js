@@ -60,16 +60,8 @@ Page({
         return;
       }
       const res = await request('/login/wxLogin', 'POST', { data: { code } });
-      if (res?.success && res?.data?.isNewUser) {
-        await wx.setStorageSync('temp_token', res.data.tempToken);
-        wx.navigateTo({
-          url: '/pages/login/bindChoice',
-        });
-        return;
-      }
       if (res?.success && res?.data?.token) {
         await wx.setStorageSync('access_token', res.data.token);
-        wx.removeStorageSync('temp_token');
         wx.switchTab({
           url: '/pages/upload/index',
         });

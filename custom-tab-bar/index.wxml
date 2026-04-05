@@ -4,11 +4,6 @@
     <text class="tab-bar__label">上传作品</text>
   </view>
 
-  <view class="tab-bar__item {{value === 'home' ? 'tab-bar__item--active' : ''}}" bindtap="handleChange" data-value="home">
-    <t-icon name="home" size="48rpx" />
-    <text class="tab-bar__label">作品范例</text>
-  </view>
-
   <view class="tab-bar__item {{value === 'my' ? 'tab-bar__item--active' : ''}}" bindtap="handleChange" data-value="my">
     <t-icon name="user" size="48rpx" />
     <text class="tab-bar__label">我的</text>

@@ -438,6 +438,29 @@ Page({
     this._pollTimer = setTimeout(poll, HEALING_POLL_FIRST_MS);
   },
 
+  async onDeleteTap() {
+    const { workId } = this.data;
+    if (!workId) return;
+    const confirmed = await new Promise((resolve) => {
+      wx.showModal({
+        title: '删除作品',
+        content: '删除后不可恢复，确认删除？',
+        confirmText: '删除',
+        confirmColor: '#e53935',
+        cancelText: '取消',
+        success: (res) => resolve(res.confirm),
+      });
+    });
+    if (!confirmed) return;
+    try {
+      await request('/work/delete', 'POST', { data: { workId } });
+      wx.showToast({ title: '已删除', icon: 'success' });
+      setTimeout(() => wx.navigateBack(), 800);
+    } catch (err) {
+      wx.showToast({ title: '删除失败，请稍后重试', icon: 'none' });
+    }
+  },
+
   async onTogglePrivacyTap() {
     const { healingIsPublic, healingStatus, healingAnalyzed } = this.data;
     // 未分析时后端还没有 healing 记录，仅切换本地预设状态

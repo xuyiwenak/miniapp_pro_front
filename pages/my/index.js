@@ -10,16 +10,12 @@ const STAR_EMOJI_MAP = {
   射手座: '♐', 摩羯座: '♑', 水瓶座: '♒', 双鱼座: '♓',
 };
 
-const TAB_MODES = ['published', 'draft', 'healing'];
-
 Page({
   behaviors: [useToastBehavior],
 
   data: {
     isLoad: false,
     personalInfo: {},
-    tabs: ['已上传', '草稿箱', '已分析'],
-    activeTab: 0,
     workList: [],
     worksLoading: false,
     showMbtiGuide: false,
@@ -37,7 +33,7 @@ Page({
     try {
       const personalInfo = await this.getPersonalInfo();
       this.setData({ isLoad: true, personalInfo });
-      this.fetchWorks(TAB_MODES[this.data.activeTab]);
+      this.fetchWorks();
     } catch {
       this.setData({ isLoad: false, personalInfo: {} });
     }
@@ -55,11 +51,10 @@ Page({
     return info;
   },
 
-  async fetchWorks(mode) {
-    if (mode === 'healing') return;
+  async fetchWorks() {
     this.setData({ worksLoading: true, workList: [] });
     try {
-      const res = await request('/work/list', 'GET', { status: mode });
+      const res = await request('/work/list', 'GET', { status: 'published' });
       const body = res.data || res;
       const list = Array.isArray(body) ? body : body?.data || [];
       const workList = list.map((item) => ({
@@ -72,24 +67,34 @@ Page({
     }
   },
 
-  onTabTap(e) {
-    const index = e.currentTarget.dataset.index;
-    if (index === this.data.activeTab) return;
-    if (index === 2) {
-      wx.navigateTo({ url: '/pages/ai-list/index' });
-      return;
-    }
-    this.setData({ activeTab: index });
-    this.fetchWorks(TAB_MODES[index]);
-  },
-
   onWorkTap(e) {
     const workId = e.currentTarget.dataset.workId;
     if (!workId) return;
-    const source = this.data.activeTab === 1 ? 'my' : '';
-    let url = `/pages/workDetail/index?workId=${encodeURIComponent(workId)}`;
-    if (source) url += `&source=${source}`;
-    wx.navigateTo({ url });
+    wx.navigateTo({ url: `/pages/workDetail/index?workId=${encodeURIComponent(workId)}` });
+  },
+
+  onDeleteTap(e) {
+    const workId = e.currentTarget.dataset.workId;
+    if (!workId) return;
+    wx.showModal({
+      title: '删除作品',
+      content: '确定要删除这件作品吗？删除后将无法恢复，OSS 文件和分析数据也会一并清除。',
+      confirmText: '确认删除',
+      confirmColor: '#FF4D4F',
+      cancelText: '取消',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          await request('/work/delete', 'POST', { data: { workId } });
+          const newList = (this.data.workList || []).filter((item) => item.workId !== workId);
+          this.setData({ workList: newList });
+          wx.showToast({ title: '已删除', icon: 'success' });
+        } catch (err) {
+          const message = (err && err.message) || err?.data?.message || '删除失败，请稍后重试';
+          wx.showToast({ title: message, icon: 'none' });
+        }
+      },
+    });
   },
 
   onSettingTap() {

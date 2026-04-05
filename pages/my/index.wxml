@@ -95,24 +95,9 @@
     </block>
   </view>
 
-  <!-- Tab 栏 + 内容区 -->
+  <!-- 作品区 -->
   <view class="func-section">
-    <!-- XHS 风格 Tab -->
-    <view class="tab-bar">
-      <view
-        class="tab-bar__item {{activeTab === index ? 'tab-bar__item--active' : ''}}"
-        wx:for="{{tabs}}"
-        wx:key="*this"
-        bindtap="onTabTap"
-        data-index="{{index}}"
-      >
-        <text class="tab-bar__label">{{item}}</text>
-        <view class="tab-bar__line" wx:if="{{activeTab === index}}" />
-      </view>
-    </view>
-
-    <!-- 作品列表（已上传 / 草稿箱） -->
-    <view class="work-grid" wx:if="{{activeTab !== 2}}">
+    <view class="work-grid">
       <view class="work-grid__loading" wx:if="{{worksLoading}}">加载中...</view>
       <view class="work-grid__empty" wx:elif="{{!workList.length}}">暂无作品</view>
       <view class="work-grid__list" wx:else>
@@ -127,7 +112,12 @@
           <view class="work-grid__img-wrap">
             <image class="work-grid__img" src="{{work.coverUrl}}" mode="aspectFill" lazy-load aria-label="{{work.desc || '作品图片'}}" />
           </view>
-          <view class="work-grid__desc">{{work.desc || '无标题作品'}}</view>
+          <view class="work-grid__bottom">
+            <text class="work-grid__desc">{{work.desc || '无标题作品'}}</text>
+            <view class="work-grid__del" catchtap="onDeleteTap" data-work-id="{{work.workId}}">
+              <t-icon name="delete" size="32rpx" color="#bbb" />
+            </view>
+          </view>
         </view>
       </view>
     </view>

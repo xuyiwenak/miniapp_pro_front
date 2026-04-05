@@ -1,9 +1,0 @@
-{
-  "usingComponents": {
-    "t-navbar": "tdesign-miniprogram/navbar/navbar",
-    "t-button": "tdesign-miniprogram/button/button",
-    "t-input": "tdesign-miniprogram/input/input"
-  },
-  "navigationBarTitleText": "登录"
-}
-

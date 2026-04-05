@@ -52,9 +52,7 @@
   </view>
   <view class="work-detail__ai">
     <view class="work-detail__ai-header">
-      <view class="work-detail__ai-title">
-        <text class="work-detail__ai-label">分析结果</text>
-      </view>
+      <view class="work-detail__ai-title"></view>
       <view class="work-detail__ai-action">
         <block wx:if="{{healingStatus === 'none' && !healingLoading}}">
           <block wx:if="{{isOwner}}">
@@ -92,9 +90,9 @@
           </block>
         </block>
         <block wx:elif="{{healingAnalyzed && healingVisible}}">
-          <text class="work-detail__ai-status">
-            {{healingDominantEmotionLabel}} {{healingDominantEmotionScore}}%
-          </text>
+          <view class="work-detail__ai-privacy-toggle" wx:if="{{isOwner}}" bindtap="onTogglePrivacyTap">
+            <t-icon name="{{healingIsPublic ? 'browse' : 'browse-off'}}" size="40rpx" class="work-detail__ai-eye-icon work-detail__ai-eye-icon--tap" />
+          </view>
         </block>
       </view>
     </view>
@@ -139,6 +137,9 @@
     </view>
     <view class="work-detail__meta" wx:if="{{work.createdAtDisplay}}">
       <text>{{work.createdAtDisplay}}</text>
+    </view>
+    <view class="work-detail__delete" wx:if="{{isOwner}}" bindtap="onDeleteTap">
+      <t-icon name="delete" size="40rpx" class="work-detail__delete-icon" />
     </view>
   </view>
 </view>
