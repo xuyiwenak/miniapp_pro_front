@@ -1,4 +1,5 @@
 import request from '~/api/request';
+import { uploadImage } from '~/api/upload';
 import { getOnboardingStatus, updateOnboarding } from '~/api/onboarding';
 import { UPLOAD_DAILY_LIMIT } from '~/config/constants';
 
@@ -47,6 +48,7 @@ Page({
     draftBirth: '',
     draftStar: '',
     birthPickerVisible: false,
+    publishedWorkId: '',
   },
 
   async onShow() {
@@ -139,6 +141,59 @@ Page({
       wx.showToast({ title: '请先同意隐私保护声明', icon: 'none' });
       return;
     }
-    wx.navigateTo({ url: '/pages/release/index' });
+    const token = wx.getStorageSync('access_token');
+    if (!token) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempFilePath = res.tempFiles[0]?.tempFilePath;
+        if (!tempFilePath) return;
+        this._uploadAndPublish(tempFilePath);
+      },
+    });
+  },
+
+  async _uploadAndPublish(tempFilePath) {
+    wx.showLoading({ title: '上传中...' });
+    try {
+      const { url } = await uploadImage(tempFilePath);
+      const payload = {
+        desc: '',
+        tags: [],
+        images: [{ url, name: 'image', type: 'image' }],
+        status: 'published',
+      };
+      wx.showLoading({ title: '发布中...' });
+      const res = await request('/work/publish', 'POST', { data: payload });
+      wx.hideLoading();
+      if (res && (res.success || res.data)) {
+        const body = res.data || res;
+        const workId = body.data?.workId || body.workId || '';
+        this.setData({ publishedWorkId: workId });
+        wx.showToast({ title: '发布成功', icon: 'success' });
+        this._goToWorkDetail();
+      } else {
+        wx.showToast({ title: '发布失败', icon: 'none' });
+      }
+    } catch (err) {
+      wx.hideLoading();
+      const code = err && (err.code ?? err.data?.code);
+      const msg = code === 401 ? '请先登录' : ((err && err.message) || '发布失败');
+      wx.showToast({ title: msg, icon: 'none' });
+    }
+  },
+
+  _goToWorkDetail() {
+    const workId = this.data.publishedWorkId;
+    if (workId) {
+      wx.navigateTo({ url: `/pages/workDetail/index?workId=${workId}&source=my&autoAnalyze=1` });
+    } else {
+      wx.reLaunch({ url: '/pages/work-list/index' });
+    }
   },
 });
